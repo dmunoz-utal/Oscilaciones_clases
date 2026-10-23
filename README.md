@@ -70,34 +70,30 @@ Repositorio: [https://github.com/dmunoz-utal/Oscilaciones_clases.git](https://gi
 
 ---
 
-## 🚀 Instalación y Uso
+## 🚀 Despliegue en Vercel (100% Automático y Gratuito)
 
-### Prerrequisitos
-Tener instalado Python 3.10 o superior (incluyendo Python 3.14).
+¡Este repositorio está optimizado para **Vercel** sin necesidad de configurar servidores!
 
-### Instalación de dependencias
+1. Ve a [vercel.com](https://vercel.com) e inicia sesión con tu cuenta de GitHub.
+2. Haz clic en **"Add New..."** -> **"Project"**.
+3. Selecciona el repositorio: `Oscilaciones_clases`.
+4. Deja la configuración por defecto y haz clic en **"Deploy"**.
+
+En menos de 15 segundos tendrás tu aplicación web publicada con URL pública (por ejemplo: `https://oscilaciones-clases.vercel.app`) lista para compartir con tus estudiantes.
+
+---
+
+## 💻 Ejecución Local
+
+### Opción A: Versión Web Directa (Sin instalar librerías)
+Simplemente abre el archivo `index.html` en cualquier navegador web (Chrome, Edge, Firefox, Safari).
+
+### Opción B: Versión Streamlit en Python
 ```bash
 pip install -r requirements.txt
-```
-
-### Ejecutar la Aplicación
-
-#### En Windows:
-Puedes hacer doble clic en el archivo `run_app.bat`, o ejecutar por consola:
-```bash
 streamlit run app.py
 ```
-
-#### En Linux / macOS:
-```bash
-python run_app.py
-```
-o bien:
-```bash
-streamlit run app.py
-```
-
-La aplicación abrirá automáticamente una pestaña en tu navegador web en `http://localhost:8501`.
+*(O doble clic en `run_app.bat` en Windows).*
 
 ---
 
