@@ -91,7 +91,7 @@ Simplemente abre el archivo `index.html` en cualquier navegador web (Chrome, Edg
 ### Opción B: Versión Streamlit en Python
 ```bash
 pip install -r requirements.txt
-streamlit run app.py
+streamlit run streamlit_app.py
 ```
 *(O doble clic en `run_app.bat` en Windows).*
 
