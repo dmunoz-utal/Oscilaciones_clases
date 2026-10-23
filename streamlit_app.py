@@ -425,8 +425,10 @@ elif app_mode == "🟣 2 Grados de Libertad (2 GDL)":
     st.session_state["signal_2dof_t"] = sim_2dof["t"]
     st.session_state["signal_2dof_x1"] = sim_2dof["x1"]
     st.session_state["signal_2dof_x2"] = sim_2dof["x2"]
+    st.session_state["signal_2dof_xsum"] = sim_2dof["x1"] + sim_2dof["x2"]
     st.session_state["signal_2dof_name1"] = f"2 GDL - Masa 1 (m1={m1}kg)"
     st.session_state["signal_2dof_name2"] = f"2 GDL - Masa 2 (m2={m2}kg)"
+    st.session_state["signal_2dof_namesum"] = f"2 GDL - Suma x₁(t) + x₂(t)"
 
     with col_main:
         k1_c, k2_c, k3_c, k4_c = st.columns(4)
@@ -475,7 +477,8 @@ elif app_mode == "🟣 2 Grados de Libertad (2 GDL)":
         ])
 
         with tab_2dof_time:
-            fig_2t = plot_2dof_time_response(sim_2dof, F01, F02)
+            show_sum_streamlit = st.checkbox("Mostrar curva de la suma x₁(t) + x₂(t)", value=True)
+            fig_2t = plot_2dof_time_response(sim_2dof, F01, F02, show_sum=show_sum_streamlit)
             st.plotly_chart(fig_2t, use_container_width=True)
 
         with tab_2dof_modes:
@@ -539,6 +542,7 @@ elif app_mode == "📊 Análisis de Fourier y Ajuste Espectral":
         if "signal_2dof_t" in st.session_state:
             available_sources.append("Simulación 2 GDL: Masa 1 x₁(t)")
             available_sources.append("Simulación 2 GDL: Masa 2 x₂(t)")
+            available_sources.append("Simulación 2 GDL: Suma x₁(t) + x₂(t)")
 
         source_choice = st.selectbox(
             "Origen de la señal a analizar:",
@@ -559,6 +563,10 @@ elif app_mode == "📊 Análisis de Fourier y Ajuste Espectral":
             t_signal = st.session_state["signal_2dof_t"]
             x_signal = st.session_state["signal_2dof_x2"]
             signal_name = st.session_state["signal_2dof_name2"]
+        elif source_choice == "Simulación 2 GDL: Suma x₁(t) + x₂(t)":
+            t_signal = st.session_state["signal_2dof_t"]
+            x_signal = st.session_state["signal_2dof_xsum"]
+            signal_name = st.session_state["signal_2dof_namesum"]
         else:
             # Señal sintética con 3 armónicos y decaimiento o ruido
             t_signal = np.linspace(0, 20, 2000)

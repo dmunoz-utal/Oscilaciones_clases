@@ -201,13 +201,14 @@ def plot_resonance_curve(sys_1dof):
 
     return fig
 
-def plot_2dof_time_response(sim_res: dict, F01: float, F02: float):
+def plot_2dof_time_response(sim_res: dict, F01: float, F02: float, show_sum: bool = True):
     """
-    Gráfico interactivo de desplazamiento temporal para 2 GDL: x1(t) y x2(t).
+    Gráfico interactivo de desplazamiento temporal para 2 GDL: x1(t), x2(t) y suma x1(t) + x2(t).
     """
     t = sim_res["t"]
     x1 = sim_res["x1"]
     x2 = sim_res["x2"]
+    x_sum = x1 + x2
 
     fig = go.Figure()
 
@@ -219,10 +220,15 @@ def plot_2dof_time_response(sim_res: dict, F01: float, F02: float):
         go.Scatter(x=t, y=x2, mode="lines", name="Masa 2: x₂(t)",
                    line=dict(color=COLOR_M2, width=2.5))
     )
+    if show_sum:
+        fig.add_trace(
+            go.Scatter(x=t, y=x_sum, mode="lines", name="Suma: x₁(t) + x₂(t)",
+                       line=dict(color="#2ca02c", width=2.2, dash="dot"))
+        )
 
     fig.update_layout(
         template="plotly_white",
-        title="Respuesta en el Tiempo de Masas Acopladas: x₁(t) y x₂(t)",
+        title="Respuesta Temporal de Masas Acopladas: x₁(t), x₂(t) y Suma x₁(t) + x₂(t)",
         height=450,
         margin=dict(l=40, r=30, t=50, b=40),
         hovermode="x unified",

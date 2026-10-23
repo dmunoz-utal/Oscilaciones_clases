@@ -471,13 +471,17 @@
               
               <!-- BARRA DE REPRODUCCIÓN / ANIMACIÓN 2 GDL -->
               <div id="anim-bar-2dof" class="bg-purple-50/80 border border-purple-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                   <button id="btn-2dof-play" onclick="togglePlay2DOF()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 shadow-sm transition active:scale-95">
                     <span id="btn-2dof-icon">▶️</span> <span id="btn-2dof-text">Iniciar Oscilación 2 GDL</span>
                   </button>
                   <button onclick="showFullPlot2DOF()" class="px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-medium rounded-lg text-xs transition">
                     ⏹️ Ver Gráfico Completo
                   </button>
+                  <label class="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-100/80 hover:bg-emerald-100 px-3 py-2 rounded-lg border border-emerald-300 shadow-2xs cursor-pointer select-none transition">
+                    <input type="checkbox" id="check-2dof-sum" checked onchange="toggle2DOFSum()" class="accent-emerald-600 w-3.5 h-3.5 rounded">
+                    <span>➕ Mostrar Suma x₁(t) + x₂(t)</span>
+                  </label>
                 </div>
 
                 <div class="flex items-center gap-3 text-xs font-medium text-slate-700">
@@ -539,6 +543,7 @@
                 <option value="1dof">Señal actual de 1 GDL: x(t)</option>
                 <option value="2dof-m1">Señal actual de 2 GDL: Masa 1 x1(t)</option>
                 <option value="2dof-m2">Señal actual de 2 GDL: Masa 2 x2(t)</option>
+                <option value="2dof-sum">Señal actual de 2 GDL: Suma x1(t) + x2(t)</option>
                 <option value="demo">Señal Sintética de Prueba (3 tonos acoplados)</option>
               </select>
             </div>
@@ -1356,7 +1361,9 @@
         curr_v2 += (dt / 6) * (k1[3] + 2*k2[3] + 2*k3[3] + k4[3]);
       }
 
-      currentSignal2DOF = { t, x1, x2, v1, v2, isFixedFixed };
+      const xSum = new Array(N);
+      for (let i = 0; i < N; i++) xSum[i] = x1[i] + x2[i];
+      currentSignal2DOF = { t, x1, x2, xSum, v1, v2, isFixedFixed };
 
       const max1 = Math.max(...x1.map(Math.abs));
       const max2 = Math.max(...x2.map(Math.abs));
@@ -1370,9 +1377,18 @@
       drawCanvas2DOF(x1[0], x2[0], Math.max(max1, max2), isFixedFixed);
     }
 
+    function toggle2DOFSum() {
+      const sig = currentSignal2DOF;
+      if (!sig.t || sig.t.length === 0) return;
+      const currIdx = animState2DOF.isPlaying ? animState2DOF.currentFrame : sig.t.length - 1;
+      plot2DOFTime(sig.t, sig.x1, sig.x2, currIdx);
+    }
+
     function plot2DOFTime(t, x1, x2, sliceIdx) {
       if (sliceIdx === undefined || sliceIdx === null) sliceIdx = t.length - 1;
       sliceIdx = Math.max(1, Math.min(sliceIdx, t.length - 1));
+
+      const showSum = document.getElementById('check-2dof-sum') ? document.getElementById('check-2dof-sum').checked : true;
 
       const subT = t.slice(0, sliceIdx + 1);
       const subX1 = x1.slice(0, sliceIdx + 1);
@@ -1399,9 +1415,28 @@
         }
       ];
 
-      const maxAbs = Math.max(0.1, Math.max(...x1.map(Math.abs), ...x2.map(Math.abs)) * 1.25);
+      if (showSum) {
+        const subXSum = subX1.map((val, idx) => val + subX2[idx]);
+        traces.push({
+          x: subT, y: subXSum, mode: 'lines', name: 'Suma: x₁(t) + x₂(t)',
+          line: { color: '#059669', width: 2.5, dash: 'dot' }
+        });
+        traces.push({
+          x: [t[sliceIdx]], y: [x1[sliceIdx] + x2[sliceIdx]], mode: 'markers', name: 'Posición Suma',
+          marker: { color: '#059669', size: 9, line: { color: '#ffffff', width: 2 } },
+          showlegend: false
+        });
+      }
+
+      let maxVals = [...x1.map(Math.abs), ...x2.map(Math.abs)];
+      if (showSum) {
+        const sumVals = x1.map((v, i) => Math.abs(v + x2[i]));
+        maxVals = maxVals.concat(sumVals);
+      }
+      const maxAbs = Math.max(0.1, Math.max(...maxVals) * 1.25);
+
       const layout = {
-        title: { text: 'Oscilación Temporal de Masas Acopladas: x₁(t) y x₂(t)', font: { size: 14 } },
+        title: { text: showSum ? 'Oscilación Temporal: x₁(t), x₂(t) y Suma x₁(t) + x₂(t)' : 'Oscilación Temporal de Masas Acopladas: x₁(t) y x₂(t)', font: { size: 14 } },
         xaxis: { title: 'Tiempo t [s]', range: [0, t[t.length - 1]], zeroline: true },
         yaxis: { title: 'Desplazamiento [m]', range: [-maxAbs, maxAbs], zeroline: true },
         margin: { l: 45, r: 20, t: 40, b: 40 },
@@ -1637,6 +1672,9 @@
       } else if (src === '2dof-m2') {
         t = currentSignal2DOF.t;
         x = currentSignal2DOF.x2;
+      } else if (src === '2dof-sum') {
+        t = currentSignal2DOF.t;
+        x = currentSignal2DOF.xSum || currentSignal2DOF.x1.map((v, i) => v + currentSignal2DOF.x2[i]);
       } else {
         t = [];
         x = [];
