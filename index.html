@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Oscilaciones y Análisis de Fourier | 1 y 2 GDL</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Plotly.js -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <!-- KaTeX for beautiful math -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    .mono { font-family: 'Fira Code', monospace; }
+    .card-metric {
+      background: white;
+      border-radius: 0.75rem;
+      border-left: 4px solid #2563eb;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    input[type=range] { accent-color: #2563eb; }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- NAVBAR -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <span class="text-2xl">⚙️</span>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-white leading-tight">Simulador de Oscilaciones</h1>
+          <p class="text-xs text-slate-400">1 y 2 GDL • Vibraciones Libres, Forzadas y Fourier</p>
+        </div>
+      </div>
+      
+      <!-- Navegación por módulos -->
+      <nav class="hidden md:flex space-x-1" id="nav-tabs">
+        <button onclick="switchTab('1dof')" id="nav-1dof" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition bg-blue-600 text-white">
+          🔵 1 Grado de Libertad
+        </button>
+        <button onclick="switchTab('2dof')" id="nav-2dof" class="px-3 py-1.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+          🟣 2 Grados de Libertad
+        </button>
+        <button onclick="switchTab('fourier')" id="nav-fourier" class="px-3 py-1.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+          📊 Análisis de Fourier
+        </button>
+        <button onclick="switchTab('teoria')" id="nav-teoria" class="px-3 py-1.5 rounded-lg text-sm font-medium transition text-slate-300 hover:bg-slate-800 hover:text-white">
+          📖 Teoría y Fórmulas
+        </button>
+      </nav>
+
+      <a href="https://github.com/dmunoz-utal/Oscilaciones_clases" target="_blank" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-md flex items-center gap-1.5 border border-slate-700">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path></svg>
+        GitHub
+      </a>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="md:hidden flex overflow-x-auto px-4 py-2 bg-slate-800 space-x-2 text-xs">
+      <button onclick="switchTab('1dof')" class="px-2.5 py-1 rounded bg-blue-600 text-white whitespace-nowrap">1 GDL</button>
+      <button onclick="switchTab('2dof')" class="px-2.5 py-1 rounded bg-slate-700 text-slate-200 whitespace-nowrap">2 GDL</button>
+      <button onclick="switchTab('fourier')" class="px-2.5 py-1 rounded bg-slate-700 text-slate-200 whitespace-nowrap">Fourier</button>
+      <button onclick="switchTab('teoria')" class="px-2.5 py-1 rounded bg-slate-700 text-slate-200 whitespace-nowrap">Teoría</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+    <!-- ============================================================== -->
+    <!-- MÓDULO 1: 1 GRADO DE LIBERTAD (1 GDL)                          -->
+    <!-- ============================================================== -->
+    <section id="tab-1dof" class="space-y-6">
+      
+      <!-- Banner -->
+      <div class="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white rounded-xl p-5 shadow-sm">
+        <h2 class="text-xl font-bold flex items-center gap-2">
+          <span>🔵</span> Sistema de 1 Grado de Libertad (1 GDL)
+        </h2>
+        <p class="text-sm text-blue-100 mt-1">
+          Ecuación gobernante: \( m \ddot{x}(t) + c \dot{x}(t) + k x(t) = F_0 \cos(\omega t) \). Simulación precisa de vibración libre, amortiguamiento y resonancia.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Panel de Control Izquierdo (4 cols) -->
+        <div class="lg:col-span-4 space-y-4">
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
+            
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Preajustes didácticos:</label>
+              <select id="preset-1dof" onchange="applyPreset1DOF()" class="w-full text-sm border-slate-300 rounded-lg p-2 border bg-slate-50 focus:ring-2 focus:ring-blue-500">
+                <option value="subamort">1. Libre Subamortiguada (0 < ζ < 1)</option>
+                <option value="noamort">2. Libre No Amortiguada (c = 0)</option>
+                <option value="critico">3. Críticamente Amortiguada (ζ = 1)</option>
+                <option value="sobreamort">4. Sobreamortiguada (ζ > 1)</option>
+                <option value="resonancia">5. Resonancia Armónica (ω = ωn)</option>
+                <option value="aislamiento">6. Aislamiento de Vibraciones (ω >> ωn)</option>
+              </select>
+            </div>
+
+            <hr class="border-slate-100">
+
+            <!-- Parámetros Estructurales -->
+            <div class="space-y-3">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Parámetros del Sistema</h3>
+              
+              <div>
+                <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                  <span>Masa \(m\):</span>
+                  <span class="font-bold text-blue-600" id="val-1dof-m">2.0 kg</span>
+                </div>
+                <input type="range" id="param-1dof-m" min="0.2" max="20" step="0.1" value="2.0" oninput="update1DOF()" class="w-full">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                  <span>Rigidez del resorte \(k\):</span>
+                  <span class="font-bold text-blue-600" id="val-1dof-k">50.0 N/m</span>
+                </div>
+                <input type="range" id="param-1dof-k" min="1" max="200" step="1" value="50.0" oninput="update1DOF()" class="w-full">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                  <span>Amortiguamiento \(c\):</span>
+                  <span class="font-bold text-blue-600" id="val-1dof-c">2.0 N·s/m</span>
+                </div>
+                <input type="range" id="param-1dof-c" min="0" max="40" step="0.2" value="2.0" oninput="update1DOF()" class="w-full">
+              </div>
+            </div>
+
+            <hr class="border-slate-100">
+
+            <!-- Fuerza Externa -->
+            <div class="space-y-3">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Fuerza Externa \(F(t) = F_0 \cos(\omega t)\)</h3>
+              
+              <div class="flex items-center gap-3">
+                <label class="text-xs font-medium flex items-center gap-1.5">
+                  <input type="radio" name="force-1dof-type" value="free" checked onchange="toggleForce1DOF()"> Libre (\(F_0=0\))
+                </label>
+                <label class="text-xs font-medium flex items-center gap-1.5">
+                  <input type="radio" name="force-1dof-type" value="forced" onchange="toggleForce1DOF()"> Forzada Armónica
+                </label>
+              </div>
+
+              <div id="box-force-1dof" class="hidden space-y-3 pt-2">
+                <div>
+                  <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                    <span>Amplitud \(F_0\):</span>
+                    <span class="font-bold text-emerald-600" id="val-1dof-F0">5.0 N</span>
+                  </div>
+                  <input type="range" id="param-1dof-F0" min="0" max="50" step="0.5" value="5.0" oninput="update1DOF()" class="w-full">
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                    <span>Frecuencia \(\omega\):</span>
+                    <span class="font-bold text-emerald-600" id="val-1dof-w">5.0 rad/s</span>
+                  </div>
+                  <input type="range" id="param-1dof-w" min="0.5" max="25" step="0.1" value="5.0" oninput="update1DOF()" class="w-full">
+                </div>
+              </div>
+            </div>
+
+            <hr class="border-slate-100">
+
+            <!-- Condiciones Iniciales -->
+            <div class="space-y-3">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Condiciones Iniciales</h3>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-xs text-slate-500">Posición \(x_0\) [m]:</label>
+                  <input type="number" id="param-1dof-x0" value="0.2" step="0.05" oninput="update1DOF()" class="w-full text-sm border rounded p-1.5 bg-slate-50">
+                </div>
+                <div>
+                  <label class="text-xs text-slate-500">Velocidad \(v_0\) [m/s]:</label>
+                  <input type="number" id="param-1dof-v0" value="0.0" step="0.1" oninput="update1DOF()" class="w-full text-sm border rounded p-1.5 bg-slate-50">
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
+                  <span>Tiempo total:</span>
+                  <span class="font-bold" id="val-1dof-tmax">20 s</span>
+                </div>
+                <input type="range" id="param-1dof-tmax" min="5" max="60" step="1" value="20" oninput="update1DOF()" class="w-full">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Panel de Resultados y Gráficos (8 cols) -->
+        <div class="lg:col-span-8 space-y-4">
+          
+          <!-- Tarjetas de Métricas -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="card-metric p-3">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Frecuencia Natural \(\omega_n\)</div>
+              <div class="text-lg font-bold text-slate-900 mt-0.5" id="metric-1dof-wn">5.00 <span class="text-xs font-normal text-slate-500">rad/s</span></div>
+              <div class="text-[11px] text-slate-400" id="metric-1dof-fn">0.80 Hz • T = 1.26 s</div>
+            </div>
+
+            <div class="card-metric p-3" style="border-left-color: #8b5cf6;">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Razón de Amortig. \(\zeta\)</div>
+              <div class="text-lg font-bold text-slate-900 mt-0.5" id="metric-1dof-zeta">0.100</div>
+              <div class="text-[11px] text-slate-500 font-medium" id="metric-1dof-regime">Subamortiguado</div>
+            </div>
+
+            <div class="card-metric p-3" style="border-left-color: #10b981;">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Frec. Amortiguada \(\omega_d\)</div>
+              <div class="text-lg font-bold text-slate-900 mt-0.5" id="metric-1dof-wd">4.97 <span class="text-xs font-normal text-slate-500">rad/s</span></div>
+              <div class="text-[11px] text-slate-400" id="metric-1dof-fd">0.79 Hz</div>
+            </div>
+
+            <div class="card-metric p-3" style="border-left-color: #f59e0b;">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Amplitud / Desfase</div>
+              <div class="text-lg font-bold text-slate-900 mt-0.5" id="metric-1dof-amp">0.200 m</div>
+              <div class="text-[11px] text-slate-400" id="metric-1dof-phase">Fase: 0.0°</div>
+            </div>
+          </div>
+
+          <!-- Sub-pestañas de gráficos 1 GDL -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="flex border-b border-slate-200 bg-slate-50 px-4 pt-2 gap-2 text-xs font-semibold">
+              <button onclick="switchSubTab1DOF('time')" id="subtab-1dof-time" class="px-3 py-2 border-b-2 border-blue-600 text-blue-600 bg-white rounded-t-md">
+                📈 Desplazamiento x(t) y Velocidad
+              </button>
+              <button onclick="switchSubTab1DOF('phase')" id="subtab-1dof-phase" class="px-3 py-2 text-slate-600 hover:text-slate-900">
+                🌀 Diagrama de Fase (x vs v)
+              </button>
+              <button onclick="switchSubTab1DOF('bode')" id="subtab-1dof-bode" class="px-3 py-2 text-slate-600 hover:text-slate-900">
+                🎯 Curva de Resonancia M(r)
+              </button>
+            </div>
+
+            <div class="p-4">
+              <div id="plot-1dof-time" class="w-full h-[450px]"></div>
+              <div id="plot-1dof-phase" class="w-full h-[450px] hidden"></div>
+              <div id="plot-1dof-bode" class="w-full h-[450px] hidden"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- MÓDULO 2: 2 GRADOS DE LIBERTAD (2 GDL)                          -->
+    <!-- ============================================================== -->
+    <section id="tab-2dof" class="space-y-6 hidden">
+      
+      <!-- Banner -->
+      <div class="bg-gradient-to-r from-purple-800 via-indigo-700 to-blue-700 text-white rounded-xl p-5 shadow-sm">
+        <h2 class="text-xl font-bold flex items-center gap-2">
+          <span>🟣</span> Sistema de 2 Grados de Libertad (2 GDL)
+        </h2>
+        <p class="text-sm text-purple-100 mt-1">
+          Ecuación matricial: \( \mathbf{M} \ddot{\mathbf{x}} + \mathbf{C} \dot{\mathbf{x}} + \mathbf{K} \mathbf{x} = \mathbf{F}(t) \). Modos normales de vibración, frecuencias naturales acopladas y batimientos.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Panel de Control 2 GDL (4 cols) -->
+        <div class="lg:col-span-4 space-y-4">
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
+            
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Topología del Sistema:</label>
+              <select id="config-2dof" onchange="update2DOF()" class="w-full text-sm border-slate-300 rounded-lg p-2 border bg-slate-50">
+                <option value="fixed-fixed">Pared — m1 — m2 — Pared (2 apoyos fijos)</option>
+                <option value="fixed-free">Pared — m1 — m2 — Libre (Extremo en voladizo)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Preajustes didácticos:</label>
+              <select id="preset-2dof" onchange="applyPreset2DOF()" class="w-full text-sm border-slate-300 rounded-lg p-2 border bg-slate-50">
+                <option value="batimiento">1. Batimiento / Transferencia de Energía</option>
+                <option value="modo1">2. Modo 1 Puro (En fase)</option>
+                <option value="modo2">3. Modo 2 Puro (En contrafase)</option>
+                <option value="resonancia1">4. Resonancia en Modo 1 (ω = ωn1)</option>
+                <option value="resonancia2">5. Resonancia en Modo 2 (ω = ωn2)</option>
+              </select>
+            </div>
+
+            <hr class="border-slate-100">
+
+            <!-- Masas -->
+            <div class="space-y-3">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Masas [kg]</h3>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-xs text-slate-600">Masa \(m_1\):</label>
+                  <input type="number" id="param-2dof-m1" value="2.0" step="0.5" min="0.1" oninput="update2DOF()" class="w-full text-sm border rounded p-1.5 bg-slate-50">
+                </div>
+                <div>
+                  <label class="text-xs text-slate-600">Masa \(m_2\):</label>
+                  <input type="number" id="param-2dof-m2" value="2.0" step="0.5" min="0.1" oninput="update2DOF()" class="w-full text-sm border rounded p-1.5 bg-slate-50">
+                </div>
+              </div>
+            </div>
+
+            <!-- Resortes -->
+            <div class="space-y-3">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Rigideces de Resortes [N/m]</h3>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="text-xs text-slate-600">\(k_1\):</label>
+                  <input type="number" id="param-2dof-k1" value="50.0" step="5" min="0.5" oninput="update2DOF()" class="w-full text-sm border rounded p-1 bg-slate-50">
+                </div>
+                <div>
+                  <label class="text-xs text-slate-600">\(k_2\) (Acople):</label>
+                  <input type="number" id="param-2dof-k2" value="5.0" step="1" min="0.1" oninput="update2DOF()" class="w-full text-sm border rounded p-1 bg-slate-50">
+                </div>
+                <div id="box-k3">
+                  <label class="text-xs text-slate-600">\(k_3\):</label>
+                  <input type="number" id="param-2dof-k3" value="50.0" step="5" min="0.5" oninput="update2DOF()" class="w-full text-sm border rounded p-1 bg-slate-50">
+                </div>
+              </div>
+            </div>
+
+            <!-- Amortiguamiento -->
+            <div class="space-y-3">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Amortiguadores [N·s/m]</h3>
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="text-xs text-slate-600">\(c_1\):</label>
+                  <input type="number" id="param-2dof-c1" value="0.0" step="0.1" min="0" oninput="update2DOF()" class="w-full text-sm border rounded p-1 bg-slate-50">
+                </div>
+                <div>
+                  <label class="text-xs text-slate-600">\(c_2\):</label>
+                  <input type="number" id="param-2dof-c2" value="0.0" step="0.1" min="0" oninput="update2DOF()" class="w-full text-sm border rounded p-1 bg-slate-50">
+                </div>
+                <div id="box-c3">
+                  <label class="text-xs text-slate-600">\(c_3\):</label>
+                  <input type="number" id="param-2dof-c3" value="0.0" step="0.1" min="0" oninput="update2DOF()" class="w-full text-sm border rounded p-1 bg-slate-50">
+                </div>
+              </div>
+            </div>
+
+            <!-- Excitación -->
+            <div class="space-y-3">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Fuerzas Externas</h3>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-xs text-slate-600">\(F_{01}\) sobre \(m_1\) [N]:</label>
+                  <input type="number" id="param-2dof-F01" value="0.0" step="1" min="0" oninput="update2DOF()" class="w-full text-sm border rounded p-1 bg-slate-50">
+                </div>
+                <div>
+                  <label class="text-xs text-slate-600">Frec. \(\omega\) [rad/s]:</label>
+                  <input type="number" id="param-2dof-w" value="0.0" step="0.2" min="0" oninput="update2DOF()" class="w-full text-sm border rounded p-1 bg-slate-50">
+                </div>
+              </div>
+            </div>
+
+            <!-- Condiciones Iniciales -->
+            <div class="space-y-2">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Condiciones Iniciales</h3>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span>\(x_1(0)\) [m]:</span>
+                  <input type="number" id="param-2dof-x1-0" value="0.20" step="0.05" oninput="update2DOF()" class="w-full border rounded p-1 bg-slate-50">
+                </div>
+                <div>
+                  <span>\(x_2(0)\) [m]:</span>
+                  <input type="number" id="param-2dof-x2-0" value="0.0" step="0.05" oninput="update2DOF()" class="w-full border rounded p-1 bg-slate-50">
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Panel Gráficos 2 GDL (8 cols) -->
+        <div class="lg:col-span-8 space-y-4">
+          
+          <!-- Métricas 2 GDL -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="card-metric p-3" style="border-left-color: #2563eb;">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase">Modo 1 (\(\omega_{n1}\))</div>
+              <div class="text-lg font-bold text-slate-900 mt-0.5" id="metric-2dof-w1">4.74 <span class="text-xs font-normal text-slate-500">rad/s</span></div>
+              <div class="text-[11px] text-blue-600 font-medium" id="metric-2dof-f1">0.75 Hz • En Fase</div>
+            </div>
+
+            <div class="card-metric p-3" style="border-left-color: #ea580c;">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase">Modo 2 (\(\omega_{n2}\))</div>
+              <div class="text-lg font-bold text-slate-900 mt-0.5" id="metric-2dof-w2">5.48 <span class="text-xs font-normal text-slate-500">rad/s</span></div>
+              <div class="text-[11px] text-orange-600 font-medium" id="metric-2dof-f2">0.87 Hz • Contrafase</div>
+            </div>
+
+            <div class="card-metric p-3" style="border-left-color: #10b981;">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase">Relación x2 / x1</div>
+              <div class="text-sm font-bold text-slate-800 mt-1" id="metric-2dof-ratio1">Modo 1: +1.00</div>
+              <div class="text-sm font-bold text-slate-800" id="metric-2dof-ratio2">Modo 2: -1.00</div>
+            </div>
+
+            <div class="card-metric p-3" style="border-left-color: #8b5cf6;">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase">Amplitudes Máximas</div>
+              <div class="text-base font-bold text-slate-900 mt-1" id="metric-2dof-amps">|x1|=0.20 |x2|=0.20</div>
+              <div class="text-[11px] text-slate-400">Observadas en simulación</div>
+            </div>
+          </div>
+
+          <!-- Sub-pestañas 2 GDL -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="flex border-b border-slate-200 bg-slate-50 px-4 pt-2 gap-2 text-xs font-semibold">
+              <button onclick="switchSubTab2DOF('time')" id="subtab-2dof-time" class="px-3 py-2 border-b-2 border-purple-600 text-purple-600 bg-white rounded-t-md">
+                📈 Respuestas x1(t) y x2(t)
+              </button>
+              <button onclick="switchSubTab2DOF('modes')" id="subtab-2dof-modes" class="px-3 py-2 text-slate-600 hover:text-slate-900">
+                📊 Formas Modales
+              </button>
+              <button onclick="switchSubTab2DOF('orbit')" id="subtab-2dof-orbit" class="px-3 py-2 text-slate-600 hover:text-slate-900">
+                🌀 Plano de Acoplamiento (x1 vs x2)
+              </button>
+            </div>
+
+            <div class="p-4">
+              <div id="plot-2dof-time" class="w-full h-[450px]"></div>
+              <div id="plot-2dof-modes" class="w-full h-[450px] hidden"></div>
+              <div id="plot-2dof-orbit" class="w-full h-[450px] hidden"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- MÓDULO 3: ANÁLISIS DE FOURIER Y AJUSTE ESPECTRAL               -->
+    <!-- ============================================================== -->
+    <section id="tab-fourier" class="space-y-6 hidden">
+      
+      <!-- Banner -->
+      <div class="bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-700 text-white rounded-xl p-5 shadow-sm">
+        <h2 class="text-xl font-bold flex items-center gap-2">
+          <span>📊</span> Análisis de Fourier y Reconstrucción por Componentes
+        </h2>
+        <p class="text-sm text-emerald-100 mt-1">
+          Descomposición espectral por Transformada Rápida de Fourier (FFT). Ajusta el número de componentes \(N\) para reconstruir la señal y comparar con el residuo.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Panel Izquierdo Fourier (4 cols) -->
+        <div class="lg:col-span-4 space-y-4">
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
+            
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Origen de la Señal a Analizar:</label>
+              <select id="fourier-source" onchange="runFourierAnalysis()" class="w-full text-sm border-slate-300 rounded-lg p-2 border bg-slate-50">
+                <option value="1dof">Señal actual de 1 GDL: x(t)</option>
+                <option value="2dof-m1">Señal actual de 2 GDL: Masa 1 x1(t)</option>
+                <option value="2dof-m2">Señal actual de 2 GDL: Masa 2 x2(t)</option>
+                <option value="demo">Señal Sintética de Prueba (3 tonos acoplados)</option>
+              </select>
+            </div>
+
+            <hr class="border-slate-100">
+
+            <!-- Control del número de componentes -->
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <label class="text-xs font-bold text-slate-700 uppercase">Componentes del Ajuste (N):</label>
+                <span class="text-lg font-black text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-md" id="val-fourier-n">3</span>
+              </div>
+              <input type="range" id="param-fourier-n" min="1" max="20" step="1" value="3" oninput="updateFourierN()" class="w-full accent-emerald-600">
+              <p class="text-xs text-slate-500">
+                Desplaza la barra para cambiar el número de armónicos/frecuencias dominantes retenidas en el ajuste.
+              </p>
+            </div>
+
+            <hr class="border-slate-100">
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Unidad en Eje de Frecuencias:</label>
+              <div class="flex gap-4 text-xs font-medium text-slate-700 mt-1">
+                <label class="flex items-center gap-1.5 cursor-pointer">
+                  <input type="radio" name="fourier-unit" value="rad" checked onchange="runFourierAnalysis()"> Radianes por segundo [rad/s]
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer">
+                  <input type="radio" name="fourier-unit" value="hz" onchange="runFourierAnalysis()"> Hertz [Hz]
+                </label>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Panel Gráficos Fourier (8 cols) -->
+        <div class="lg:col-span-8 space-y-4">
+          
+          <!-- Métricas de Ajuste -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="card-metric p-3" style="border-left-color: #059669;">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase">Componentes Usados</div>
+              <div class="text-lg font-bold text-slate-900 mt-0.5" id="metric-fourier-n">3 <span class="text-xs font-normal text-slate-500">picos</span></div>
+              <div class="text-[11px] text-slate-400">Armónicos principales</div>
+            </div>
+
+            <div class="card-metric p-3" style="border-left-color: #2563eb;">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase">Bondad de Ajuste R²</div>
+              <div class="text-lg font-bold text-slate-900 mt-0.5" id="metric-fourier-r2">0.9982</div>
+              <div class="text-[11px] text-emerald-600 font-medium" id="metric-fourier-quality">Excelente ajuste</div>
+            </div>
+
+            <div class="card-metric p-3" style="border-left-color: #f59e0b;">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase">Error RMSE</div>
+              <div class="text-lg font-bold text-slate-900 mt-0.5" id="metric-fourier-rmse">2.41e-3</div>
+              <div class="text-[11px] text-slate-400">Error cuadrático medio</div>
+            </div>
+
+            <div class="card-metric p-3" style="border-left-color: #8b5cf6;">
+              <div class="text-[11px] font-semibold text-slate-500 uppercase">Energía Capturada</div>
+              <div class="text-lg font-bold text-slate-900 mt-0.5" id="metric-fourier-energy">99.85 %</div>
+              <div class="text-[11px] text-slate-400">Potencia de la señal</div>
+            </div>
+          </div>
+
+          <!-- Pestañas de Gráficos Fourier -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="flex border-b border-slate-200 bg-slate-50 px-4 pt-2 gap-2 text-xs font-semibold">
+              <button onclick="switchSubTabFourier('spec')" id="subtab-fourier-spec" class="px-3 py-2 border-b-2 border-emerald-600 text-emerald-600 bg-white rounded-t-md">
+                📊 Espectro FFT de Frecuencias
+              </button>
+              <button onclick="switchSubTabFourier('recon')" id="subtab-fourier-recon" class="px-3 py-2 text-slate-600 hover:text-slate-900">
+                🔄 Reconstrucción vs Original y Error
+              </button>
+              <button onclick="switchSubTabFourier('table')" id="subtab-fourier-table" class="px-3 py-2 text-slate-600 hover:text-slate-900">
+                📋 Tabla de Armónicos y Ecuación
+              </button>
+            </div>
+
+            <div class="p-4">
+              <div id="plot-fourier-spec" class="w-full h-[450px]"></div>
+              <div id="plot-fourier-recon" class="w-full h-[500px] hidden"></div>
+              
+              <div id="box-fourier-table" class="hidden space-y-4">
+                <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
+                  <h4 class="text-xs font-bold text-slate-600 uppercase mb-2">Ecuación Analítica del Ajuste:</h4>
+                  <div id="fourier-formula-katex" class="text-sm overflow-x-auto py-2"></div>
+                </div>
+
+                <div class="overflow-x-auto">
+                  <table class="w-full text-xs text-left text-slate-600">
+                    <thead class="text-[11px] text-slate-700 uppercase bg-slate-100">
+                      <tr>
+                        <th class="px-3 py-2">Rango</th>
+                        <th class="px-3 py-2">Frecuencia \(\omega\) [rad/s]</th>
+                        <th class="px-3 py-2">Frecuencia \(f\) [Hz]</th>
+                        <th class="px-3 py-2">Amplitud \(A_k\) [m]</th>
+                        <th class="px-3 py-2">Fase \(\phi_k\) [°]</th>
+                        <th class="px-3 py-2">Potencia [%]</th>
+                      </tr>
+                    </thead>
+                    <tbody id="fourier-components-tbody" class="divide-y divide-slate-100"></tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- MÓDULO 4: GUÍA TEÓRICA Y FÓRMULAS                              -->
+    <!-- ============================================================== -->
+    <section id="tab-teoria" class="space-y-6 hidden max-w-4xl mx-auto">
+      
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-6">
+        <h2 class="text-2xl font-bold text-slate-900 border-b pb-3">📖 Fundamentos Teóricos de Vibraciones y Fourier</h2>
+
+        <div class="space-y-3">
+          <h3 class="text-lg font-bold text-blue-600">1. Sistema de 1 Grado de Libertad</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            La 2ª Ley de Newton para un sistema masa-resorte-amortiguador sometido a una fuerza armónica establece:
+          </p>
+          <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono" id="katex-eq-1dof">
+            $$m \ddot{x}(t) + c \dot{x}(t) + k x(t) = F_0 \cos(\omega t)$$
+          </div>
+          <p class="text-sm text-slate-600">
+            Definiendo la frecuencia natural \(\omega_n = \sqrt{k/m}\) y la razón de amortiguamiento \(\zeta = \frac{c}{2\sqrt{km}}\):
+          </p>
+          <ul class="list-disc list-inside text-xs text-slate-600 space-y-1.5 ml-2">
+            <li><strong>Subamortiguado (\(0 < \zeta < 1\)):</strong> Movimiento oscilatorio armónico con envolvente exponencial decreciente \(e^{-\zeta \omega_n t}\) a la frecuencia amortiguada \(\omega_d = \omega_n \sqrt{1 - \zeta^2}\).</li>
+            <li><strong>Críticamente amortiguado (\(\zeta = 1\)):</strong> Regreso más rápido al equilibrio sin oscilación.</li>
+            <li><strong>Sobreamortiguado (\(\zeta > 1\)):</strong> Respuesta lenta y aperiódica sin oscilación.</li>
+            <li><strong>Factor de Amplificación Dinámica \(M(r)\):</strong> Para \(r = \omega / \omega_n\), \(M(r) = \frac{1}{\sqrt{(1-r^2)^2 + (2\zeta r)^2}}\). En resonancia (\(r=1\)), \(M = 1/(2\zeta)\).</li>
+          </ul>
+        </div>
+
+        <hr class="border-slate-100">
+
+        <div class="space-y-3">
+          <h3 class="text-lg font-bold text-purple-600">2. Sistema de 2 Grados de Libertad</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Las ecuaciones acopladas en formato matricial son:
+          </p>
+          <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono" id="katex-eq-2dof">
+            $$\mathbf{M} \ddot{\mathbf{x}} + \mathbf{C} \dot{\mathbf{x}} + \mathbf{K} \mathbf{x} = \mathbf{F}(t)$$
+          </div>
+          <p class="text-sm text-slate-600">
+            Para vibración libre no amortiguada, proponiendo solución armónica \(\mathbf{x}(t) = \boldsymbol{\phi} e^{i \omega t}\), se obtiene el problema de autovalores generalizado:
+          </p>
+          <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono" id="katex-eq-det">
+            $$\det(\mathbf{K} - \omega^2 \mathbf{M}) = 0$$
+          </div>
+          <p class="text-sm text-slate-600">
+            Cuyas soluciones entregan las frecuencias naturales \(\omega_{n1}\) (primer modo, movimiento en fase) y \(\omega_{n2}\) (segundo modo, movimiento en contrafase).
+          </p>
+        </div>
+
+        <hr class="border-slate-100">
+
+        <div class="space-y-3">
+          <h3 class="text-lg font-bold text-emerald-600">3. Transformada de Fourier y Reconstrucción Espectral</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            La Transformada Discreta de Fourier (FFT) convierte la respuesta temporal \(x(t)\) en componentes sinusoidales elementales:
+          </p>
+          <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono" id="katex-eq-fourier">
+            $$\hat{x}(t) = \bar{x} + \sum_{k=1}^N A_k \cos(\omega_k t + \phi_k)$$
+          </div>
+          <p class="text-sm text-slate-600">
+            Al seleccionar los \(N\) componentes con mayor contenido energético, se observa cómo la suma armónica converge rápidamente a la señal observada, permitiendo descomponer fenómenos complejos como el batimiento o la superposición modal.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- JAVASCRIPT SIMULATION & GRAPHICS LOGIC -->
+  <script>
+    // Variables globales de señales simuladas
+    let currentSignal1DOF = { t: [], x: [], v: [], F: [] };
+    let currentSignal2DOF = { t: [], x1: [], x2: [], v1: [], v2: [] };
+
+    // --- TAB SWITCHER ---
+    function switchTab(tabId) {
+      ['1dof', '2dof', 'fourier', 'teoria'].forEach(id => {
+        document.getElementById(`tab-${id}`).classList.add('hidden');
+        const navBtn = document.getElementById(`nav-${id}`);
+        if (navBtn) {
+          navBtn.classList.remove('bg-blue-600', 'text-white');
+          navBtn.classList.add('text-slate-300');
+        }
+      });
+
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      if (activeNav) {
+        activeNav.classList.add('bg-blue-600', 'text-white');
+        activeNav.classList.remove('text-slate-300');
+      }
+
+      // Redibujar gráficos para ajustar responsive
+      setTimeout(() => {
+        if (tabId === '1dof') update1DOF();
+        if (tabId === '2dof') update2DOF();
+        if (tabId === 'fourier') runFourierAnalysis();
+      }, 50);
+    }
+
+    function switchSubTab1DOF(subId) {
+      ['time', 'phase', 'bode'].forEach(id => {
+        document.getElementById(`plot-1dof-${id}`).classList.add('hidden');
+        document.getElementById(`subtab-1dof-${id}`).classList.remove('border-b-2', 'border-blue-600', 'text-blue-600', 'bg-white');
+      });
+      document.getElementById(`plot-1dof-${subId}`).classList.remove('hidden');
+      document.getElementById(`subtab-1dof-${subId}`).classList.add('border-b-2', 'border-blue-600', 'text-blue-600', 'bg-white');
+      Plotly.Plots.resize(`plot-1dof-${subId}`);
+    }
+
+    function switchSubTab2DOF(subId) {
+      ['time', 'modes', 'orbit'].forEach(id => {
+        document.getElementById(`plot-2dof-${id}`).classList.add('hidden');
+        document.getElementById(`subtab-2dof-${id}`).classList.remove('border-b-2', 'border-purple-600', 'text-purple-600', 'bg-white');
+      });
+      document.getElementById(`plot-2dof-${subId}`).classList.remove('hidden');
+      document.getElementById(`subtab-2dof-${subId}`).classList.add('border-b-2', 'border-purple-600', 'text-purple-600', 'bg-white');
+      Plotly.Plots.resize(`plot-2dof-${subId}`);
+    }
+
+    function switchSubTabFourier(subId) {
+      ['spec', 'recon', 'table'].forEach(id => {
+        const el = id === 'table' ? document.getElementById('box-fourier-table') : document.getElementById(`plot-fourier-${id}`);
+        el.classList.add('hidden');
+        document.getElementById(`subtab-fourier-${id}`).classList.remove('border-b-2', 'border-emerald-600', 'text-emerald-600', 'bg-white');
+      });
+      const activeEl = subId === 'table' ? document.getElementById('box-fourier-table') : document.getElementById(`plot-fourier-${subId}`);
+      activeEl.classList.remove('hidden');
+      document.getElementById(`subtab-fourier-${subId}`).classList.add('border-b-2', 'border-emerald-600', 'text-emerald-600', 'bg-white');
+      if (subId !== 'table') Plotly.Plots.resize(`plot-fourier-${subId}`);
+    }
+
+    function toggleForce1DOF() {
+      const isForced = document.querySelector('input[name="force-1dof-type"]:checked').value === 'forced';
+      document.getElementById('box-force-1dof').classList.toggle('hidden', !isForced);
+      update1DOF();
+    }
+
+    // ==============================================================
+    // LÓGICA FÍSICA: 1 GRADO DE LIBERTAD (1 GDL)
+    // ==============================================================
+    function applyPreset1DOF() {
+      const p = document.getElementById('preset-1dof').value;
+      const setVal = (id, val) => document.getElementById(id).value = val;
+
+      if (p === 'subamort') {
+        setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 2.0);
+        document.querySelector('input[name="force-1dof-type"][value="free"]').checked = true;
+        setVal('param-1dof-x0', 0.20); setVal('param-1dof-v0', 0.0);
+      } else if (p === 'noamort') {
+        setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 0.0);
+        document.querySelector('input[name="force-1dof-type"][value="free"]').checked = true;
+        setVal('param-1dof-x0', 0.20); setVal('param-1dof-v0', 0.0);
+      } else if (p === 'critico') {
+        // cc = 2*sqrt(50*2) = 20
+        setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 20.0);
+        document.querySelector('input[name="force-1dof-type"][value="free"]').checked = true;
+        setVal('param-1dof-x0', 0.20); setVal('param-1dof-v0', 0.0);
+      } else if (p === 'sobreamort') {
+        setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 35.0);
+        document.querySelector('input[name="force-1dof-type"][value="free"]').checked = true;
+        setVal('param-1dof-x0', 0.20); setVal('param-1dof-v0', 0.5);
+      } else if (p === 'resonancia') {
+        setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 1.5);
+        document.querySelector('input[name="force-1dof-type"][value="forced"]').checked = true;
+        setVal('param-1dof-F0', 8.0); setVal('param-1dof-w', 5.0); // wn = 5
+        setVal('param-1dof-x0', 0.0); setVal('param-1dof-v0', 0.0);
+      } else if (p === 'aislamiento') {
+        setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 2.0);
+        document.querySelector('input[name="force-1dof-type"][value="forced"]').checked = true;
+        setVal('param-1dof-F0', 15.0); setVal('param-1dof-w', 15.0);
+        setVal('param-1dof-x0', 0.0); setVal('param-1dof-v0', 0.0);
+      }
+      toggleForce1DOF();
+    }
+
+    function update1DOF() {
+      const m = parseFloat(document.getElementById('param-1dof-m').value);
+      const k = parseFloat(document.getElementById('param-1dof-k').value);
+      const c = parseFloat(document.getElementById('param-1dof-c').value);
+      const isForced = document.querySelector('input[name="force-1dof-type"]:checked').value === 'forced';
+      const F0 = isForced ? parseFloat(document.getElementById('param-1dof-F0').value) : 0.0;
+      const omega = isForced ? parseFloat(document.getElementById('param-1dof-w').value) : 0.0;
+      const x0 = parseFloat(document.getElementById('param-1dof-x0').value);
+      const v0 = parseFloat(document.getElementById('param-1dof-v0').value);
+      const tMax = parseFloat(document.getElementById('param-1dof-tmax').value);
+
+      document.getElementById('val-1dof-m').textContent = `${m.toFixed(1)} kg`;
+      document.getElementById('val-1dof-k').textContent = `${k.toFixed(1)} N/m`;
+      document.getElementById('val-1dof-c').textContent = `${c.toFixed(1)} N·s/m`;
+      document.getElementById('val-1dof-F0').textContent = `${F0.toFixed(1)} N`;
+      document.getElementById('val-1dof-w').textContent = `${omega.toFixed(1)} rad/s`;
+      document.getElementById('val-1dof-tmax').textContent = `${tMax.toFixed(0)} s`;
+
+      // Cálculos teóricos
+      const wn = Math.sqrt(k / m);
+      const fn = wn / (2 * Math.PI);
+      const cc = 2 * Math.sqrt(k * m);
+      const zeta = c / cc;
+      const wd = zeta < 1.0 ? wn * Math.sqrt(1 - zeta * zeta) : 0.0;
+      const fd = wd / (2 * Math.PI);
+
+      let regime = "No amortiguado (ζ = 0)";
+      if (zeta > 0 && zeta < 1) regime = `Subamortiguado (ζ = ${zeta.toFixed(3)})`;
+      else if (Math.abs(zeta - 1.0) < 0.01) regime = "Críticamente amortiguado (ζ ≈ 1.0)";
+      else if (zeta > 1) regime = `Sobreamortiguado (ζ = ${zeta.toFixed(3)})`;
+
+      document.getElementById('metric-1dof-wn').innerHTML = `${wn.toFixed(2)} <span class="text-xs font-normal text-slate-500">rad/s</span>`;
+      document.getElementById('metric-1dof-fn').textContent = `${fn.toFixed(2)} Hz • T = ${(2*Math.PI/wn).toFixed(2)} s`;
+      document.getElementById('metric-1dof-zeta').textContent = zeta.toFixed(3);
+      document.getElementById('metric-1dof-regime').textContent = regime;
+      document.getElementById('metric-1dof-wd').innerHTML = `${wd.toFixed(2)} <span class="text-xs font-normal text-slate-500">rad/s</span>`;
+      document.getElementById('metric-1dof-fd').textContent = `${fd.toFixed(2)} Hz`;
+
+      // Régimen permanente bajo fuerza armónica
+      let r = 0, M = 1, X_steady = 0, phi_deg = 0;
+      if (F0 > 0 && omega > 0) {
+        r = omega / wn;
+        const denom = Math.sqrt(Math.pow(1 - r*r, 2) + Math.pow(2 * zeta * r, 2));
+        M = 1 / denom;
+        X_steady = (F0 / k) * M;
+        let phi_rad = Math.atan2(2 * zeta * r, 1 - r*r);
+        if (phi_rad < 0) phi_rad += 2 * Math.PI;
+        phi_deg = phi_rad * (180 / Math.PI);
+      }
+
+      // Simulación numérica RK4
+      const N = 2000;
+      const dt = tMax / N;
+      const t = new Array(N);
+      const x = new Array(N);
+      const v = new Array(N);
+      const F = new Array(N);
+
+      let curr_x = x0;
+      let curr_v = v0;
+
+      for (let i = 0; i < N; i++) {
+        const time = i * dt;
+        t[i] = time;
+        x[i] = curr_x;
+        v[i] = curr_v;
+        const f_val = F0 * Math.cos(omega * time);
+        F[i] = f_val;
+
+        // Derivada: [v, (F - c*v - k*x)/m]
+        const f_eval = (tm, px, pv) => {
+          const ft = F0 * Math.cos(omega * tm);
+          return [pv, (ft - c * pv - k * px) / m];
+        };
+
+        const k1 = f_eval(time, curr_x, curr_v);
+        const k2 = f_eval(time + 0.5*dt, curr_x + 0.5*dt*k1[0], curr_v + 0.5*dt*k1[1]);
+        const k3 = f_eval(time + 0.5*dt, curr_x + 0.5*dt*k2[0], curr_v + 0.5*dt*k2[1]);
+        const k4 = f_eval(time + dt, curr_x + dt*k3[0], curr_v + dt*k3[1]);
+
+        curr_x += (dt / 6) * (k1[0] + 2*k2[0] + 2*k3[0] + k4[0]);
+        curr_v += (dt / 6) * (k1[1] + 2*k2[1] + 2*k3[1] + k4[1]);
+      }
+
+      currentSignal1DOF = { t, x, v, F };
+
+      // Actualizar tarjeta amplitud
+      const maxObs = Math.max(...x.map(Math.abs));
+      if (F0 > 0) {
+        document.getElementById('metric-1dof-amp').textContent = `${X_steady.toFixed(3)} m`;
+        document.getElementById('metric-1dof-phase').textContent = `Fase φ: ${phi_deg.toFixed(1)}° (r = ${r.toFixed(2)})`;
+      } else {
+        document.getElementById('metric-1dof-amp').textContent = `${maxObs.toFixed(3)} m`;
+        document.getElementById('metric-1dof-phase').textContent = `Libre (Amplitud máx observada)`;
+      }
+
+      // Graficar
+      plot1DOFTime(t, x, v, F, k, F0, zeta, wn, wd, x0, v0);
+      plot1DOFPhase(x, v);
+      plot1DOFBode(zeta, r, M, phi_deg);
+    }
+
+    function plot1DOFTime(t, x, v, F, k, zeta, wn, wd, x0, v0) {
+      const traces = [
+        {
+          x: t, y: x, mode: 'lines', name: 'Desplazamiento x(t)',
+          line: { color: '#2563eb', width: 2.2 }
+        }
+      ];
+
+      // Envolvente analítica si es vibración libre subamortiguada
+      if (F0 === 0 && zeta > 0 && zeta < 1 && wd > 0) {
+        const C = Math.sqrt(x0*x0 + Math.pow((v0 + zeta*wn*x0)/wd, 2));
+        const envPos = t.map(tm => C * Math.exp(-zeta * wn * tm));
+        const envNeg = envPos.map(val => -val);
+        traces.push({
+          x: t, y: envPos, mode: 'lines', name: 'Envolvente ±Ce^(-ζωnt)',
+          line: { color: '#8b5cf6', width: 1.5, dash: 'dot' }
+        });
+        traces.push({
+          x: t, y: envNeg, mode: 'lines', showlegend: false,
+          line: { color: '#8b5cf6', width: 1.5, dash: 'dot' }
+        });
+      }
+
+      // Fuerza equivalente F(t)/k
+      if (F0 > 0) {
+        const Fscaled = F.map(f => f / k);
+        traces.push({
+          x: t, y: Fscaled, mode: 'lines', name: 'F(t)/k (Deformación estática)',
+          line: { color: '#10b981', width: 1.5, dash: 'dash' }
+        });
+      }
+
+      const layout = {
+        title: { text: 'Respuesta Temporal x(t) [m]', font: { size: 14 } },
+        xaxis: { title: 'Tiempo t [s]', zeroline: true },
+        yaxis: { title: 'Posición [m]', zeroline: true },
+        margin: { l: 45, r: 20, t: 40, b: 40 },
+        legend: { orientation: 'h', y: 1.15, x: 1, xanchor: 'right' }
+      };
+
+      Plotly.react('plot-1dof-time', traces, layout, { responsive: true, displayModeBar: false });
+    }
+
+    function plot1DOFPhase(x, v) {
+      const trace = {
+        x: x, y: v, mode: 'lines', name: 'Espacio de estados',
+        line: { color: '#2563eb', width: 2 }
+      };
+      const traceInit = {
+        x: [x[0]], y: [v[0]], mode: 'markers+text', name: 'Inicio',
+        text: ['Inicio'], textposition: 'top right',
+        marker: { color: '#10b981', size: 10 }
+      };
+
+      const layout = {
+        title: { text: 'Diagrama de Fase (dx/dt vs x)', font: { size: 14 } },
+        xaxis: { title: 'Posición x [m]', zeroline: true },
+        yaxis: { title: 'Velocidad dx/dt [m/s]', zeroline: true },
+        margin: { l: 45, r: 20, t: 40, b: 40 }
+      };
+
+      Plotly.react('plot-1dof-phase', [trace, traceInit], layout, { responsive: true, displayModeBar: false });
+    }
+
+    function plot1DOFBode(zeta, currR, currM, currPhi) {
+      const rArr = [];
+      const mArr = [];
+      const phiArr = [];
+      for (let r = 0.05; r <= 3.0; r += 0.02) {
+        rArr.push(r);
+        const denom = Math.sqrt(Math.pow(1 - r*r, 2) + Math.pow(2 * zeta * r, 2));
+        mArr.push(1 / denom);
+        let p = Math.atan2(2 * zeta * r, 1 - r*r);
+        if (p < 0) p += 2 * Math.PI;
+        phiArr.push(p * 180 / Math.PI);
+      }
+
+      const traceM = {
+        x: rArr, y: mArr, mode: 'lines', name: 'Factor M(r)',
+        line: { color: '#10b981', width: 2.5 }
+      };
+
+      const tracePoint = {
+        x: [currR], y: [currM], mode: 'markers+text', name: 'Punto Actual',
+        text: [`r=${currR.toFixed(2)}, M=${currM.toFixed(2)}`], textposition: 'top right',
+        marker: { color: '#ef4444', size: 10, symbol: 'diamond' }
+      };
+
+      const layout = {
+        title: { text: 'Curva de Resonancia: Factor de Amplificación Dinámica M = X / (F0/k)', font: { size: 14 } },
+        xaxis: { title: 'Razón de Frecuencias r = ω / ωn', zeroline: true },
+        yaxis: { title: 'M(r) [adimensional]', zeroline: true },
+        shapes: [{
+          type: 'line', x0: 1, x1: 1, y0: 0, y1: Math.max(...mArr),
+          line: { color: 'gray', dash: 'dash', width: 1.5 }
+        }],
+        annotations: [{
+          x: 1, y: Math.max(...mArr)*0.9, text: 'Resonancia (r=1)', showarrow: false, font: { color: 'gray' }
+        }],
+        margin: { l: 45, r: 20, t: 40, b: 40 }
+      };
+
+      Plotly.react('plot-1dof-bode', [traceM, tracePoint], layout, { responsive: true, displayModeBar: false });
+    }
+
+    // ==============================================================
+    // LÓGICA FÍSICA: 2 GRADOS DE LIBERTAD (2 GDL)
+    // ==============================================================
+    function applyPreset2DOF() {
+      const p = document.getElementById('preset-2dof').value;
+      const setVal = (id, val) => document.getElementById(id).value = val;
+
+      if (p === 'batimiento') {
+        setVal('param-2dof-m1', 2.0); setVal('param-2dof-m2', 2.0);
+        setVal('param-2dof-k1', 50.0); setVal('param-2dof-k2', 5.0); setVal('param-2dof-k3', 50.0);
+        setVal('param-2dof-c1', 0.0); setVal('param-2dof-c2', 0.0); setVal('param-2dof-c3', 0.0);
+        setVal('param-2dof-F01', 0.0); setVal('param-2dof-w', 0.0);
+        setVal('param-2dof-x1-0', 0.20); setVal('param-2dof-x2-0', 0.0);
+      } else if (p === 'modo1') {
+        setVal('param-2dof-m1', 2.0); setVal('param-2dof-m2', 2.0);
+        setVal('param-2dof-k1', 40.0); setVal('param-2dof-k2', 20.0); setVal('param-2dof-k3', 40.0);
+        setVal('param-2dof-c1', 0.0); setVal('param-2dof-c2', 0.0); setVal('param-2dof-c3', 0.0);
+        setVal('param-2dof-F01', 0.0); setVal('param-2dof-w', 0.0);
+        setVal('param-2dof-x1-0', 0.15); setVal('param-2dof-x2-0', 0.15);
+      } else if (p === 'modo2') {
+        setVal('param-2dof-m1', 2.0); setVal('param-2dof-m2', 2.0);
+        setVal('param-2dof-k1', 40.0); setVal('param-2dof-k2', 20.0); setVal('param-2dof-k3', 40.0);
+        setVal('param-2dof-c1', 0.0); setVal('param-2dof-c2', 0.0); setVal('param-2dof-c3', 0.0);
+        setVal('param-2dof-F01', 0.0); setVal('param-2dof-w', 0.0);
+        setVal('param-2dof-x1-0', 0.15); setVal('param-2dof-x2-0', -0.15);
+      } else if (p === 'resonancia1') {
+        setVal('param-2dof-m1', 2.0); setVal('param-2dof-m2', 2.0);
+        setVal('param-2dof-k1', 40.0); setVal('param-2dof-k2', 20.0); setVal('param-2dof-k3', 40.0);
+        setVal('param-2dof-c1', 0.4); setVal('param-2dof-c2', 0.2); setVal('param-2dof-c3', 0.4);
+        setVal('param-2dof-F01', 5.0); setVal('param-2dof-w', 4.47); // wn1 ≈ 4.47 rad/s
+        setVal('param-2dof-x1-0', 0.0); setVal('param-2dof-x2-0', 0.0);
+      } else if (p === 'resonancia2') {
+        setVal('param-2dof-m1', 2.0); setVal('param-2dof-m2', 2.0);
+        setVal('param-2dof-k1', 40.0); setVal('param-2dof-k2', 20.0); setVal('param-2dof-k3', 40.0);
+        setVal('param-2dof-c1', 0.4); setVal('param-2dof-c2', 0.2); setVal('param-2dof-c3', 0.4);
+        setVal('param-2dof-F01', 5.0); setVal('param-2dof-w', 6.32); // wn2 ≈ 6.32 rad/s
+        setVal('param-2dof-x1-0', 0.0); setVal('param-2dof-x2-0', 0.0);
+      }
+      update2DOF();
+    }
+
+    function update2DOF() {
+      const cfg = document.getElementById('config-2dof').value;
+      const isFixedFixed = cfg === 'fixed-fixed';
+      document.getElementById('box-k3').style.display = isFixedFixed ? 'block' : 'none';
+      document.getElementById('box-c3').style.display = isFixedFixed ? 'block' : 'none';
+
+      const m1 = parseFloat(document.getElementById('param-2dof-m1').value);
+      const m2 = parseFloat(document.getElementById('param-2dof-m2').value);
+      const k1 = parseFloat(document.getElementById('param-2dof-k1').value);
+      const k2 = parseFloat(document.getElementById('param-2dof-k2').value);
+      const k3 = isFixedFixed ? parseFloat(document.getElementById('param-2dof-k3').value) : 0.0;
+      const c1 = parseFloat(document.getElementById('param-2dof-c1').value);
+      const c2 = parseFloat(document.getElementById('param-2dof-c2').value);
+      const c3 = isFixedFixed ? parseFloat(document.getElementById('param-2dof-c3').value) : 0.0;
+
+      const F01 = parseFloat(document.getElementById('param-2dof-F01').value);
+      const omega = parseFloat(document.getElementById('param-2dof-w').value);
+      const x1_0 = parseFloat(document.getElementById('param-2dof-x1-0').value);
+      const x2_0 = parseFloat(document.getElementById('param-2dof-x2-0').value);
+
+      // Matrices K y M
+      const K11 = k1 + k2;
+      const K12 = -k2;
+      const K21 = -k2;
+      const K22 = k2 + k3;
+
+      const C11 = c1 + c2;
+      const C12 = -c2;
+      const C21 = -c2;
+      const C22 = c2 + c3;
+
+      // Autovalores analíticos exactos para 2x2: det(K - lambda*M) = 0
+      // (K11 - lambda*m1)*(K22 - lambda*m2) - K12*K21 = 0
+      // m1*m2*lambda^2 - (m1*K22 + m2*K11)*lambda + (K11*K22 - K12*K21) = 0
+      const a_eq = m1 * m2;
+      const b_eq = -(m1 * K22 + m2 * K11);
+      const c_eq = K11 * K22 - K12 * K21;
+      const disc = Math.sqrt(Math.max(0, b_eq*b_eq - 4 * a_eq * c_eq));
+
+      const lam1 = (-b_eq - disc) / (2 * a_eq);
+      const lam2 = (-b_eq + disc) / (2 * a_eq);
+
+      const w1 = Math.sqrt(Math.max(0, lam1));
+      const w2 = Math.sqrt(Math.max(0, lam2));
+      const f1 = w1 / (2 * Math.PI);
+      const f2 = w2 / (2 * Math.PI);
+
+      // Autovectores (x2 / x1)
+      const ratio1 = (K11 - lam1 * m1) / k2;
+      const ratio2 = (K11 - lam2 * m1) / k2;
+
+      document.getElementById('metric-2dof-w1').innerHTML = `${w1.toFixed(2)} <span class="text-xs font-normal text-slate-500">rad/s</span>`;
+      document.getElementById('metric-2dof-f1').textContent = `${f1.toFixed(2)} Hz • Modo 1`;
+      document.getElementById('metric-2dof-w2').innerHTML = `${w2.toFixed(2)} <span class="text-xs font-normal text-slate-500">rad/s</span>`;
+      document.getElementById('metric-2dof-f2').textContent = `${f2.toFixed(2)} Hz • Modo 2`;
+      document.getElementById('metric-2dof-ratio1').textContent = `Modo 1: x2/x1 = ${ratio1 >= 0 ? '+' : ''}${ratio1.toFixed(2)} (En fase)`;
+      document.getElementById('metric-2dof-ratio2').textContent = `Modo 2: x2/x1 = ${ratio2 >= 0 ? '+' : ''}${ratio2.toFixed(2)} (Contrafase)`;
+
+      // Simulación RK4 para 2 GDL
+      const tMax = 25.0;
+      const N = 2500;
+      const dt = tMax / N;
+      const t = new Array(N);
+      const x1 = new Array(N);
+      const x2 = new Array(N);
+      const v1 = new Array(N);
+      const v2 = new Array(N);
+
+      let curr_x1 = x1_0, curr_x2 = x2_0, curr_v1 = 0.0, curr_v2 = 0.0;
+
+      for (let i = 0; i < N; i++) {
+        const time = i * dt;
+        t[i] = time;
+        x1[i] = curr_x1;
+        x2[i] = curr_x2;
+        v1[i] = curr_v1;
+        v2[i] = curr_v2;
+
+        const f_eval2 = (tm, q1, q2, u1, u2) => {
+          const ft1 = F01 * Math.cos(omega * tm);
+          const a1 = (ft1 - C11 * u1 - C12 * u2 - K11 * q1 - K12 * q2) / m1;
+          const a2 = (- C21 * u1 - C22 * u2 - K21 * q1 - K22 * q2) / m2;
+          return [u1, u2, a1, a2];
+        };
+
+        const k1 = f_eval2(time, curr_x1, curr_x2, curr_v1, curr_v2);
+        const k2 = f_eval2(time + 0.5*dt, curr_x1 + 0.5*dt*k1[0], curr_x2 + 0.5*dt*k1[1], curr_v1 + 0.5*dt*k1[2], curr_v2 + 0.5*dt*k1[3]);
+        const k3 = f_eval2(time + 0.5*dt, curr_x1 + 0.5*dt*k2[0], curr_x2 + 0.5*dt*k2[1], curr_v1 + 0.5*dt*k2[2], curr_v2 + 0.5*dt*k2[3]);
+        const k4 = f_eval2(time + dt, curr_x1 + dt*k3[0], curr_x2 + dt*k3[1], curr_v1 + dt*k3[2], curr_v2 + dt*k3[3]);
+
+        curr_x1 += (dt / 6) * (k1[0] + 2*k2[0] + 2*k3[0] + k4[0]);
+        curr_x2 += (dt / 6) * (k1[1] + 2*k2[1] + 2*k3[1] + k4[1]);
+        curr_v1 += (dt / 6) * (k1[2] + 2*k2[2] + 2*k3[2] + k4[2]);
+        curr_v2 += (dt / 6) * (k1[3] + 2*k2[3] + 2*k3[3] + k4[3]);
+      }
+
+      currentSignal2DOF = { t, x1, x2, v1, v2 };
+
+      const max1 = Math.max(...x1.map(Math.abs));
+      const max2 = Math.max(...x2.map(Math.abs));
+      document.getElementById('metric-2dof-amps').textContent = `|x1|=${max1.toFixed(3)} |x2|=${max2.toFixed(3)} m`;
+
+      plot2DOFTime(t, x1, x2);
+      plot2DOFModes(ratio1, ratio2, w1, w2, f1, f2);
+      plot2DOFOrbit(x1, x2);
+    }
+
+    function plot2DOFTime(t, x1, x2) {
+      const trace1 = {
+        x: t, y: x1, mode: 'lines', name: 'Masa 1: x₁(t)',
+        line: { color: '#2563eb', width: 2.2 }
+      };
+      const trace2 = {
+        x: t, y: x2, mode: 'lines', name: 'Masa 2: x₂(t)',
+        line: { color: '#ea580c', width: 2.2 }
+      };
+
+      const layout = {
+        title: { text: 'Oscilación Temporal de Masas Acopladas: x₁(t) y x₂(t)', font: { size: 14 } },
+        xaxis: { title: 'Tiempo t [s]', zeroline: true },
+        yaxis: { title: 'Desplazamiento [m]', zeroline: true },
+        margin: { l: 45, r: 20, t: 40, b: 40 },
+        legend: { orientation: 'h', y: 1.15, x: 1, xanchor: 'right' }
+      };
+
+      Plotly.react('plot-2dof-time', [trace1, trace2], layout, { responsive: true, displayModeBar: false });
+    }
+
+    function plot2DOFModes(r1, r2, w1, w2, f1, f2) {
+      const traceModo1 = {
+        x: ['Masa 1', 'Masa 2'], y: [1.0, r1], type: 'bar', name: `Modo 1 (ωn1=${w1.toFixed(2)})`,
+        marker: { color: '#2563eb' }, text: ['1.00', r1.toFixed(2)], textposition: 'outside'
+      };
+      const traceModo2 = {
+        x: ['Masa 1', 'Masa 2'], y: [1.0, r2], type: 'bar', name: `Modo 2 (ωn2=${w2.toFixed(2)})`,
+        marker: { color: '#ea580c' }, text: ['1.00', r2.toFixed(2)], textposition: 'outside'
+      };
+
+      const layout = {
+        title: { text: `Formas Modales Normalizadas (Autovectores)`, font: { size: 14 } },
+        barmode: 'group',
+        yaxis: { title: 'Amplitud Normalizada', zeroline: true },
+        margin: { l: 45, r: 20, t: 40, b: 40 },
+        legend: { orientation: 'h', y: 1.15, x: 1, xanchor: 'right' }
+      };
+
+      Plotly.react('plot-2dof-modes', [traceModo1, traceModo2], layout, { responsive: true, displayModeBar: false });
+    }
+
+    function plot2DOFOrbit(x1, x2) {
+      const trace = {
+        x: x1, y: x2, mode: 'lines', name: 'Plano x1 vs x2',
+        line: { color: '#8b5cf6', width: 1.8 }
+      };
+
+      const layout = {
+        title: { text: 'Plano de Configuración Acoplada (x₁ vs x₂)', font: { size: 14 } },
+        xaxis: { title: 'Desplazamiento Masa 1 x₁ [m]', zeroline: true },
+        yaxis: { title: 'Desplazamiento Masa 2 x₂ [m]', zeroline: true },
+        margin: { l: 45, r: 20, t: 40, b: 40 }
+      };
+
+      Plotly.react('plot-2dof-orbit', [trace], layout, { responsive: true, displayModeBar: false });
+    }
+
+    // ==============================================================
+    // LÓGICA DE FOURIER Y RECONSTRUCCIÓN POR COMPONENTES
+    // ==============================================================
+    function updateFourierN() {
+      const n = document.getElementById('param-fourier-n').value;
+      document.getElementById('val-fourier-n').textContent = n;
+      runFourierAnalysis();
+    }
+
+    function runFourierAnalysis() {
+      const src = document.getElementById('fourier-source').value;
+      const numComp = parseInt(document.getElementById('param-fourier-n').value);
+      const isRad = document.querySelector('input[name="fourier-unit"]:checked').value === 'rad';
+
+      let t, x;
+      if (src === '1dof') {
+        t = currentSignal1DOF.t;
+        x = currentSignal1DOF.x;
+      } else if (src === '2dof-m1') {
+        t = currentSignal2DOF.t;
+        x = currentSignal2DOF.x1;
+      } else if (src === '2dof-m2') {
+        t = currentSignal2DOF.t;
+        x = currentSignal2DOF.x2;
+      } else {
+        // Señal demo sintética
+        t = [];
+        x = [];
+        for (let i = 0; i < 1500; i++) {
+          const tm = i * 0.015;
+          t.push(tm);
+          x.push(
+            0.5 * Math.cos(3.0 * tm) +
+            0.25 * Math.cos(7.5 * tm + Math.PI/4) +
+            0.12 * Math.cos(12.0 * tm - Math.PI/3)
+          );
+        }
+      }
+
+      if (!t || t.length < 10) return;
+
+      const N = t.length;
+      const dt = t[1] - t[0];
+      const fs = 1 / dt;
+
+      // Cálculo de DFT unilateral
+      // Usamos una muestra optimizada hasta fs/2
+      const numFreqs = Math.min(400, Math.floor(N / 2));
+      const freqHz = [];
+      const freqRad = [];
+      const amp = [];
+      const phaseRad = [];
+
+      for (let k = 0; k < numFreqs; k++) {
+        const f_hz = (k * fs) / N;
+        freqHz.push(f_hz);
+        freqRad.push(f_hz * 2 * Math.PI);
+
+        // DFT acumulativa
+        let re = 0, im = 0;
+        const angleStep = (2 * Math.PI * k) / N;
+        for (let n = 0; n < N; n++) {
+          const ang = angleStep * n;
+          re += x[n] * Math.cos(ang);
+          im -= x[n] * Math.sin(ang);
+        }
+
+        let mag = (2.0 / N) * Math.sqrt(re*re + im*im);
+        if (k === 0) mag /= 2.0; // Componente DC
+        amp.push(mag);
+        phaseRad.push(Math.atan2(im, re));
+      }
+
+      // Componente DC
+      const dcVal = amp[0];
+
+      // Ordenar componentes AC por amplitud descendente para seleccionar los Top N
+      const acIndices = [];
+      for (let i = 1; i < numFreqs; i++) acIndices.push(i);
+      acIndices.sort((a, b) => amp[b] - amp[a]);
+
+      const selectedIndices = acIndices.slice(0, numComp);
+
+      // Reconstrucción analítica armónica
+      const xRec = new Array(N).fill(dcVal);
+      const componentsInfo = [];
+      let selectedEnergy = 0;
+
+      selectedIndices.forEach((idx, rank) => {
+        const w_k = freqRad[idx];
+        const f_k = freqHz[idx];
+        const A_k = amp[idx];
+        const phi_k = phaseRad[idx];
+        selectedEnergy += A_k * A_k;
+
+        for (let n = 0; n < N; n++) {
+          xRec[n] += A_k * Math.cos(w_k * (t[n] - t[0]) - phi_k);
+        }
+
+        componentsInfo.push({
+          rank: rank + 1,
+          freqRad: w_k,
+          freqHz: f_k,
+          amplitude: A_k,
+          phaseDeg: (-phi_k * 180 / Math.PI) % 360,
+          phaseRad: -phi_k
+        });
+      });
+
+      // Cálculo de métricas
+      let sse = 0, sst = 0;
+      const xMean = x.reduce((a, b) => a + b, 0) / N;
+      const residual = new Array(N);
+
+      for (let n = 0; n < N; n++) {
+        const res = x[n] - xRec[n];
+        residual[n] = res;
+        sse += res * res;
+        sst += Math.pow(x[n] - xMean, 2);
+      }
+
+      const mse = sse / N;
+      const rmse = Math.sqrt(mse);
+      const r2 = sst > 1e-9 ? Math.max(0, 1 - (sse / sst)) : 1.0;
+
+      let totalEnergy = 0;
+      for (let i = 1; i < numFreqs; i++) totalEnergy += amp[i] * amp[i];
+      const energyPct = totalEnergy > 1e-9 ? Math.min(100, (selectedEnergy / totalEnergy) * 100) : 100;
+
+      // Actualizar tarjetas
+      document.getElementById('metric-fourier-n').innerHTML = `${numComp} <span class="text-xs font-normal text-slate-500">picos</span>`;
+      document.getElementById('metric-fourier-r2').textContent = r2.toFixed(4);
+      document.getElementById('metric-fourier-quality').textContent = r2 > 0.95 ? 'Excelente ajuste' : 'Aproximado';
+      document.getElementById('metric-fourier-rmse').textContent = rmse.toExponential(2);
+      document.getElementById('metric-fourier-energy').textContent = `${energyPct.toFixed(2)} %`;
+
+      // Graficar
+      plotFourierSpectrum(isRad ? freqRad : freqHz, amp, componentsInfo, isRad);
+      plotFourierRecon(t, x, xRec, residual, numComp, r2);
+      buildFourierTable(componentsInfo, dcVal, numComp);
+    }
+
+    function plotFourierSpectrum(freqs, amps, comps, isRad) {
+      const xLabel = isRad ? 'Frecuencia ω [rad/s]' : 'Frecuencia f [Hz]';
+
+      const traceAll = {
+        x: freqs, y: amps, mode: 'lines', name: 'Espectro FFT',
+        line: { color: '#0ea5e9', width: 1.5 },
+        fill: 'tozeroy', fillcolor: 'rgba(14, 165, 233, 0.1)'
+      };
+
+      const selX = comps.map(c => isRad ? c.freqRad : c.freqHz);
+      const selY = comps.map(c => c.amplitude);
+      const selText = comps.map(c => `#${c.rank} (${c.amplitude.toFixed(3)} m)`);
+
+      const traceSelected = {
+        x: selX, y: selY, mode: 'markers+text', name: 'Componentes Seleccionados',
+        text: selText, textposition: 'top center',
+        marker: { color: '#ef4444', size: 10, line: { color: '#000', width: 1.5 } }
+      };
+
+      const layout = {
+        title: { text: 'Espectro de Amplitud (FFT) y Armónicos Seleccionados', font: { size: 14 } },
+        xaxis: { title: xLabel, zeroline: true },
+        yaxis: { title: 'Amplitud [m]', zeroline: true },
+        margin: { l: 45, r: 20, t: 40, b: 40 },
+        legend: { orientation: 'h', y: 1.15, x: 1, xanchor: 'right' }
+      };
+
+      Plotly.react('plot-fourier-spec', [traceAll, traceSelected], layout, { responsive: true, displayModeBar: false });
+    }
+
+    function plotFourierRecon(t, xOrig, xRec, residual, numComp, r2) {
+      const traceOrig = {
+        x: t, y: xOrig, mode: 'lines', name: 'Señal Original x(t)',
+        line: { color: '#2563eb', width: 2.2 }
+      };
+      const traceFit = {
+        x: t, y: xRec, mode: 'lines', name: `Ajuste Fourier (${numComp} comp.)`,
+        line: { color: '#ef4444', width: 2.0, dash: 'dash' }
+      };
+      const traceRes = {
+        x: t, y: residual, mode: 'lines', name: 'Error Residual e(t)',
+        line: { color: '#64748b', width: 1.2 }, yaxis: 'y2'
+      };
+
+      const layout = {
+        title: { text: `Comparación Señal Original vs Reconstrucción (R² = ${r2.toFixed(4)})`, font: { size: 14 } },
+        xaxis: { title: 'Tiempo t [s]', domain: [0, 1] },
+        yaxis: { title: 'Amplitud [m]', domain: [0.35, 1] },
+        yaxis2: { title: 'Residuo [m]', domain: [0, 0.25], zeroline: true },
+        margin: { l: 45, r: 20, t: 40, b: 40 },
+        legend: { orientation: 'h', y: 1.15, x: 1, xanchor: 'right' }
+      };
+
+      Plotly.react('plot-fourier-recon', [traceOrig, traceFit, traceRes], layout, { responsive: true, displayModeBar: false });
+    }
+
+    function buildFourierTable(comps, dcVal, numComp) {
+      const tbody = document.getElementById('fourier-components-tbody');
+      tbody.innerHTML = '';
+
+      let formulaStr = `\\hat{x}(t) = `;
+      if (Math.abs(dcVal) > 1e-3) formulaStr += `${dcVal.toFixed(3)} + `;
+
+      comps.forEach((c, i) => {
+        const row = document.createElement('tr');
+        row.className = i % 2 === 0 ? 'bg-white' : 'bg-slate-50';
+        row.innerHTML = `
+          <td class="px-3 py-2 font-bold text-slate-800">#${c.rank}</td>
+          <td class="px-3 py-2">${c.freqRad.toFixed(3)}</td>
+          <td class="px-3 py-2">${c.freqHz.toFixed(3)}</td>
+          <td class="px-3 py-2 font-semibold text-blue-600">${c.amplitude.toFixed(4)}</td>
+          <td class="px-3 py-2">${c.phaseDeg.toFixed(1)}°</td>
+          <td class="px-3 py-2">${(c.amplitude*c.amplitude).toFixed(4)}</td>
+        `;
+        tbody.appendChild(row);
+
+        if (i < 4) {
+          formulaStr += `${c.amplitude.toFixed(3)} \\cos(${c.freqRad.toFixed(2)} t ${c.phaseRad >= 0 ? '+' : ''}${c.phaseRad.toFixed(2)}) + `;
+        }
+      });
+
+      if (comps.length > 4) formulaStr += `\\dots`;
+      else formulaStr = formulaStr.replace(/ \+ $/, '');
+
+      const formDiv = document.getElementById('fourier-formula-katex');
+      katex.render(formulaStr, formDiv, { throwOnError: false });
+    }
+
+    // Inicializar al cargar
+    window.addEventListener('DOMContentLoaded', () => {
+      // Renderizar fórmulas LaTeX estáticas
+      renderMathInElement(document.body, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '\\(', right: '\\)', display: false}
+        ]
+      });
+
+      update1DOF();
+      update2DOF();
+    });
+  </script>
+
+</body>
+</html>
