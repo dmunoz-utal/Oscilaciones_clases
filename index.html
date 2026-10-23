@@ -30,6 +30,7 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
     input[type=range] { accent-color: #2563eb; }
+    canvas { image-rendering: pixelated; }
   </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
@@ -41,7 +42,7 @@
         <span class="text-2xl">⚙️</span>
         <div>
           <h1 class="text-lg font-bold tracking-tight text-white leading-tight">Simulador de Oscilaciones</h1>
-          <p class="text-xs text-slate-400">1 y 2 GDL • Vibraciones Libres, Forzadas y Fourier</p>
+          <p class="text-xs text-slate-400">1 y 2 GDL • Vibraciones Libres, Forzadas, Animación y Fourier</p>
         </div>
       </div>
       
@@ -90,7 +91,7 @@
           <span>🔵</span> Sistema de 1 Grado de Libertad (1 GDL)
         </h2>
         <p class="text-sm text-blue-100 mt-1">
-          Ecuación gobernante: \( m \ddot{x}(t) + c \dot{x}(t) + k x(t) = F_0 \cos(\omega t) \). Simulación precisa de vibración libre, amortiguamiento y resonancia.
+          Ecuación: \( m \ddot{x}(t) + c \dot{x}(t) + k x(t) = F_0 \cos(\omega t) \). Modifica los parámetros, observa las métricas en tiempo real o presiona <b>Iniciar Oscilación</b> para ver la curva \(x(t)\) dibujarse en directo.
         </p>
       </div>
 
@@ -150,10 +151,10 @@
               <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Fuerza Externa \(F(t) = F_0 \cos(\omega t)\)</h3>
               
               <div class="flex items-center gap-3">
-                <label class="text-xs font-medium flex items-center gap-1.5">
+                <label class="text-xs font-medium flex items-center gap-1.5 cursor-pointer">
                   <input type="radio" name="force-1dof-type" value="free" checked onchange="toggleForce1DOF()"> Libre (\(F_0=0\))
                 </label>
-                <label class="text-xs font-medium flex items-center gap-1.5">
+                <label class="text-xs font-medium flex items-center gap-1.5 cursor-pointer">
                   <input type="radio" name="force-1dof-type" value="forced" onchange="toggleForce1DOF()"> Forzada Armónica
                 </label>
               </div>
@@ -248,7 +249,40 @@
               </button>
             </div>
 
-            <div class="p-4">
+            <div class="p-4 space-y-3">
+              
+              <!-- BARRA DE REPRODUCCIÓN / ANIMACIÓN 1 GDL -->
+              <div id="anim-bar-1dof" class="bg-blue-50/80 border border-blue-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+                <div class="flex items-center gap-2">
+                  <button id="btn-1dof-play" onclick="togglePlay1DOF()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 shadow-sm transition active:scale-95">
+                    <span id="btn-1dof-icon">▶️</span> <span id="btn-1dof-text">Iniciar Oscilación en Tiempo Real</span>
+                  </button>
+                  <button onclick="showFullPlot1DOF()" class="px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-medium rounded-lg text-xs transition">
+                    ⏹️ Ver Gráfico Completo
+                  </button>
+                </div>
+
+                <div class="flex items-center gap-3 text-xs font-medium text-slate-700">
+                  <div class="flex items-center gap-1.5">
+                    <span>Velocidad:</span>
+                    <select id="anim-1dof-speed" onchange="changeSpeed1DOF()" class="border border-slate-300 rounded px-2 py-1 bg-white text-xs">
+                      <option value="0.5">0.5x (Lenta)</option>
+                      <option value="1.0" selected>1.0x (Normal)</option>
+                      <option value="2.0">2.0x (Rápida)</option>
+                    </select>
+                  </div>
+                  <div class="bg-white px-3 py-1 rounded-md border border-blue-200 font-mono text-blue-800 font-bold" id="anim-1dof-clock">
+                    ⏱️ t = 0.00 s / 20.0 s
+                  </div>
+                </div>
+              </div>
+
+              <!-- CANVAS CON ESQUEMA MECÁNICO ANIMADO -->
+              <div class="bg-slate-900 rounded-lg p-2 shadow-inner border border-slate-800">
+                <canvas id="canvas-1dof" width="700" height="75" class="w-full h-[75px] block"></canvas>
+              </div>
+
+              <!-- PLOTS -->
               <div id="plot-1dof-time" class="w-full h-[450px]"></div>
               <div id="plot-1dof-phase" class="w-full h-[450px] hidden"></div>
               <div id="plot-1dof-bode" class="w-full h-[450px] hidden"></div>
@@ -272,7 +306,7 @@
           <span>🟣</span> Sistema de 2 Grados de Libertad (2 GDL)
         </h2>
         <p class="text-sm text-purple-100 mt-1">
-          Ecuación matricial: \( \mathbf{M} \ddot{\mathbf{x}} + \mathbf{C} \dot{\mathbf{x}} + \mathbf{K} \mathbf{x} = \mathbf{F}(t) \). Modos normales de vibración, frecuencias naturales acopladas y batimientos.
+          Ecuación matricial: \( \mathbf{M} \ddot{\mathbf{x}} + \mathbf{C} \dot{\mathbf{x}} + \mathbf{K} \mathbf{x} = \mathbf{F}(t) \). Modos normales de vibración, frecuencias acopladas y batimientos animados.
         </p>
       </div>
 
@@ -433,7 +467,39 @@
               </button>
             </div>
 
-            <div class="p-4">
+            <div class="p-4 space-y-3">
+              
+              <!-- BARRA DE REPRODUCCIÓN / ANIMACIÓN 2 GDL -->
+              <div id="anim-bar-2dof" class="bg-purple-50/80 border border-purple-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+                <div class="flex items-center gap-2">
+                  <button id="btn-2dof-play" onclick="togglePlay2DOF()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 shadow-sm transition active:scale-95">
+                    <span id="btn-2dof-icon">▶️</span> <span id="btn-2dof-text">Iniciar Oscilación 2 GDL</span>
+                  </button>
+                  <button onclick="showFullPlot2DOF()" class="px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-medium rounded-lg text-xs transition">
+                    ⏹️ Ver Gráfico Completo
+                  </button>
+                </div>
+
+                <div class="flex items-center gap-3 text-xs font-medium text-slate-700">
+                  <div class="flex items-center gap-1.5">
+                    <span>Velocidad:</span>
+                    <select id="anim-2dof-speed" onchange="changeSpeed2DOF()" class="border border-slate-300 rounded px-2 py-1 bg-white text-xs">
+                      <option value="0.5">0.5x (Lenta)</option>
+                      <option value="1.0" selected>1.0x (Normal)</option>
+                      <option value="2.0">2.0x (Rápida)</option>
+                    </select>
+                  </div>
+                  <div class="bg-white px-3 py-1 rounded-md border border-purple-200 font-mono text-purple-800 font-bold" id="anim-2dof-clock">
+                    ⏱️ t = 0.00 s / 25.0 s
+                  </div>
+                </div>
+              </div>
+
+              <!-- CANVAS CON ESQUEMA MECÁNICO 2 GDL ANIMADO -->
+              <div class="bg-slate-900 rounded-lg p-2 shadow-inner border border-slate-800">
+                <canvas id="canvas-2dof" width="700" height="75" class="w-full h-[75px] block"></canvas>
+              </div>
+
               <div id="plot-2dof-time" class="w-full h-[450px]"></div>
               <div id="plot-2dof-modes" class="w-full h-[450px] hidden"></div>
               <div id="plot-2dof-orbit" class="w-full h-[450px] hidden"></div>
@@ -601,7 +667,7 @@
           <p class="text-sm text-slate-600 leading-relaxed">
             La 2ª Ley de Newton para un sistema masa-resorte-amortiguador sometido a una fuerza armónica establece:
           </p>
-          <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono" id="katex-eq-1dof">
+          <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono">
             $$m \ddot{x}(t) + c \dot{x}(t) + k x(t) = F_0 \cos(\omega t)$$
           </div>
           <p class="text-sm text-slate-600">
@@ -622,13 +688,13 @@
           <p class="text-sm text-slate-600 leading-relaxed">
             Las ecuaciones acopladas en formato matricial son:
           </p>
-          <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono" id="katex-eq-2dof">
+          <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono">
             $$\mathbf{M} \ddot{\mathbf{x}} + \mathbf{C} \dot{\mathbf{x}} + \mathbf{K} \mathbf{x} = \mathbf{F}(t)$$
           </div>
           <p class="text-sm text-slate-600">
             Para vibración libre no amortiguada, proponiendo solución armónica \(\mathbf{x}(t) = \boldsymbol{\phi} e^{i \omega t}\), se obtiene el problema de autovalores generalizado:
           </p>
-          <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono" id="katex-eq-det">
+          <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono">
             $$\det(\mathbf{K} - \omega^2 \mathbf{M}) = 0$$
           </div>
           <p class="text-sm text-slate-600">
@@ -643,7 +709,7 @@
           <p class="text-sm text-slate-600 leading-relaxed">
             La Transformada Discreta de Fourier (FFT) convierte la respuesta temporal \(x(t)\) en componentes sinusoidales elementales:
           </p>
-          <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono" id="katex-eq-fourier">
+          <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono">
             $$\hat{x}(t) = \bar{x} + \sum_{k=1}^N A_k \cos(\omega_k t + \phi_k)$$
           </div>
           <p class="text-sm text-slate-600">
@@ -660,8 +726,25 @@
   <!-- JAVASCRIPT SIMULATION & GRAPHICS LOGIC -->
   <script>
     // Variables globales de señales simuladas
-    let currentSignal1DOF = { t: [], x: [], v: [], F: [] };
-    let currentSignal2DOF = { t: [], x1: [], x2: [], v1: [], v2: [] };
+    let currentSignal1DOF = { t: [], x: [], v: [], F: [], k: 50, F0: 0, zeta: 0, wn: 5, wd: 0, x0: 0.2, v0: 0 };
+    let currentSignal2DOF = { t: [], x1: [], x2: [], v1: [], v2: [], isFixedFixed: true };
+
+    // Estados de animación
+    const animState1DOF = {
+      isPlaying: false,
+      currentFrame: 0,
+      reqId: null,
+      speed: 1.0,
+      lastTimestamp: null
+    };
+
+    const animState2DOF = {
+      isPlaying: false,
+      currentFrame: 0,
+      reqId: null,
+      speed: 1.0,
+      lastTimestamp: null
+    };
 
     // --- TAB SWITCHER ---
     function switchTab(tabId) {
@@ -683,8 +766,14 @@
 
       // Redibujar gráficos para ajustar responsive
       setTimeout(() => {
-        if (tabId === '1dof') update1DOF();
-        if (tabId === '2dof') update2DOF();
+        if (tabId === '1dof') {
+          showFullPlot1DOF();
+          Plotly.Plots.resize('plot-1dof-time');
+        }
+        if (tabId === '2dof') {
+          showFullPlot2DOF();
+          Plotly.Plots.resize('plot-2dof-time');
+        }
         if (tabId === 'fourier') runFourierAnalysis();
       }, 50);
     }
@@ -743,7 +832,6 @@
         document.querySelector('input[name="force-1dof-type"][value="free"]').checked = true;
         setVal('param-1dof-x0', 0.20); setVal('param-1dof-v0', 0.0);
       } else if (p === 'critico') {
-        // cc = 2*sqrt(50*2) = 20
         setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 20.0);
         document.querySelector('input[name="force-1dof-type"][value="free"]').checked = true;
         setVal('param-1dof-x0', 0.20); setVal('param-1dof-v0', 0.0);
@@ -754,7 +842,7 @@
       } else if (p === 'resonancia') {
         setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 1.5);
         document.querySelector('input[name="force-1dof-type"][value="forced"]').checked = true;
-        setVal('param-1dof-F0', 8.0); setVal('param-1dof-w', 5.0); // wn = 5
+        setVal('param-1dof-F0', 8.0); setVal('param-1dof-w', 5.0);
         setVal('param-1dof-x0', 0.0); setVal('param-1dof-v0', 0.0);
       } else if (p === 'aislamiento') {
         setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 2.0);
@@ -766,6 +854,8 @@
     }
 
     function update1DOF() {
+      stopAnimation1DOF();
+
       const m = parseFloat(document.getElementById('param-1dof-m').value);
       const k = parseFloat(document.getElementById('param-1dof-k').value);
       const c = parseFloat(document.getElementById('param-1dof-c').value);
@@ -849,7 +939,7 @@
         curr_v += (dt / 6) * (k1[1] + 2*k2[1] + 2*k3[1] + k4[1]);
       }
 
-      currentSignal1DOF = { t, x, v, F };
+      currentSignal1DOF = { t, x, v, F, k, F0, zeta, wn, wd, x0, v0 };
 
       // Actualizar tarjeta amplitud
       const maxObs = Math.max(...x.map(Math.abs));
@@ -861,21 +951,36 @@
         document.getElementById('metric-1dof-phase').textContent = `Libre (Amplitud máx observada)`;
       }
 
+      // Reiniciar reloj
+      document.getElementById('anim-1dof-clock').textContent = `⏱️ t = ${tMax.toFixed(1)} s / ${tMax.toFixed(1)} s`;
+
       // Graficar
-      plot1DOFTime(t, x, v, F, k, F0, zeta, wn, wd, x0, v0);
+      plot1DOFTime(t, x, v, F, k, F0, zeta, wn, wd, x0, v0, N - 1);
       plot1DOFPhase(x, v);
       plot1DOFBode(zeta, r, M, phi_deg);
+      drawCanvas1DOF(x[0], maxObs);
     }
 
-    function plot1DOFTime(t, x, v, F, k, zeta, wn, wd, x0, v0) {
+    function plot1DOFTime(t, x, v, F, k, F0, zeta, wn, wd, x0, v0, sliceIdx) {
+      if (sliceIdx === undefined || sliceIdx === null) sliceIdx = t.length - 1;
+      sliceIdx = Math.max(1, Math.min(sliceIdx, t.length - 1));
+
+      const subT = t.slice(0, sliceIdx + 1);
+      const subX = x.slice(0, sliceIdx + 1);
+
       const traces = [
         {
-          x: t, y: x, mode: 'lines', name: 'Desplazamiento x(t)',
-          line: { color: '#2563eb', width: 2.2 }
+          x: subT, y: subX, mode: 'lines', name: 'Desplazamiento x(t)',
+          line: { color: '#2563eb', width: 2.5 }
+        },
+        {
+          x: [t[sliceIdx]], y: [x[sliceIdx]], mode: 'markers', name: 'Posición Actual',
+          marker: { color: '#ef4444', size: 11, line: { color: '#ffffff', width: 2 } },
+          showlegend: false
         }
       ];
 
-      // Envolvente analítica si es vibración libre subamortiguada
+      // Envolvente analítica
       if (F0 === 0 && zeta > 0 && zeta < 1 && wd > 0) {
         const C = Math.sqrt(x0*x0 + Math.pow((v0 + zeta*wn*x0)/wd, 2));
         const envPos = t.map(tm => C * Math.exp(-zeta * wn * tm));
@@ -890,24 +995,174 @@
         });
       }
 
-      // Fuerza equivalente F(t)/k
+      // Fuerza equivalente
       if (F0 > 0) {
         const Fscaled = F.map(f => f / k);
         traces.push({
-          x: t, y: Fscaled, mode: 'lines', name: 'F(t)/k (Deformación estática)',
+          x: subT, y: Fscaled.slice(0, sliceIdx + 1), mode: 'lines', name: 'F(t)/k',
           line: { color: '#10b981', width: 1.5, dash: 'dash' }
         });
       }
 
+      const maxAbs = Math.max(0.1, Math.max(...x.map(Math.abs)) * 1.25);
       const layout = {
         title: { text: 'Respuesta Temporal x(t) [m]', font: { size: 14 } },
-        xaxis: { title: 'Tiempo t [s]', zeroline: true },
-        yaxis: { title: 'Posición [m]', zeroline: true },
+        xaxis: { title: 'Tiempo t [s]', range: [0, t[t.length - 1]], zeroline: true },
+        yaxis: { title: 'Posición [m]', range: [-maxAbs, maxAbs], zeroline: true },
         margin: { l: 45, r: 20, t: 40, b: 40 },
         legend: { orientation: 'h', y: 1.15, x: 1, xanchor: 'right' }
       };
 
       Plotly.react('plot-1dof-time', traces, layout, { responsive: true, displayModeBar: false });
+    }
+
+    // ANIMACIÓN EN TIEMPO REAL 1 GDL
+    function togglePlay1DOF() {
+      if (animState1DOF.isPlaying) {
+        stopAnimation1DOF();
+      } else {
+        startAnimation1DOF();
+      }
+    }
+
+    function startAnimation1DOF() {
+      const sig = currentSignal1DOF;
+      if (!sig.t || sig.t.length === 0) return;
+
+      animState1DOF.isPlaying = true;
+      document.getElementById('btn-1dof-icon').textContent = '⏸️';
+      document.getElementById('btn-1dof-text').textContent = 'Pausar';
+
+      if (animState1DOF.currentFrame >= sig.t.length - 1) {
+        animState1DOF.currentFrame = 0;
+      }
+
+      animState1DOF.lastTimestamp = performance.now();
+
+      function step(now) {
+        if (!animState1DOF.isPlaying) return;
+
+        const dtReal = (now - animState1DOF.lastTimestamp) / 1000;
+        animState1DOF.lastTimestamp = now;
+
+        const simDt = sig.t[1] - sig.t[0];
+        const framesToAdvance = Math.max(1, Math.round((dtReal * animState1DOF.speed) / simDt));
+
+        animState1DOF.currentFrame = Math.min(sig.t.length - 1, animState1DOF.currentFrame + framesToAdvance);
+
+        const currIdx = animState1DOF.currentFrame;
+        const currT = sig.t[currIdx];
+        const totalT = sig.t[sig.t.length - 1];
+
+        document.getElementById('anim-1dof-clock').textContent = `⏱️ t = ${currT.toFixed(2)} s / ${totalT.toFixed(1)} s`;
+
+        plot1DOFTime(sig.t, sig.x, sig.v, sig.F, sig.k, sig.F0, sig.zeta, sig.wn, sig.wd, sig.x0, sig.v0, currIdx);
+        drawCanvas1DOF(sig.x[currIdx], Math.max(0.1, Math.max(...sig.x.map(Math.abs))));
+
+        if (animState1DOF.currentFrame < sig.t.length - 1) {
+          animState1DOF.reqId = requestAnimationFrame(step);
+        } else {
+          stopAnimation1DOF();
+          document.getElementById('btn-1dof-icon').textContent = '🔄';
+          document.getElementById('btn-1dof-text').textContent = 'Reiniciar Oscilación';
+        }
+      }
+
+      animState1DOF.reqId = requestAnimationFrame(step);
+    }
+
+    function stopAnimation1DOF() {
+      animState1DOF.isPlaying = false;
+      if (animState1DOF.reqId) {
+        cancelAnimationFrame(animState1DOF.reqId);
+        animState1DOF.reqId = null;
+      }
+      document.getElementById('btn-1dof-icon').textContent = '▶️';
+      document.getElementById('btn-1dof-text').textContent = 'Iniciar Oscilación en Tiempo Real';
+    }
+
+    function showFullPlot1DOF() {
+      stopAnimation1DOF();
+      const sig = currentSignal1DOF;
+      if (!sig.t || sig.t.length === 0) return;
+      animState1DOF.currentFrame = sig.t.length - 1;
+      document.getElementById('anim-1dof-clock').textContent = `⏱️ t = ${sig.t[sig.t.length - 1].toFixed(1)} s / ${sig.t[sig.t.length - 1].toFixed(1)} s`;
+      plot1DOFTime(sig.t, sig.x, sig.v, sig.F, sig.k, sig.F0, sig.zeta, sig.wn, sig.wd, sig.x0, sig.v0, sig.t.length - 1);
+      drawCanvas1DOF(sig.x[sig.t.length - 1], Math.max(0.1, Math.max(...sig.x.map(Math.abs))));
+    }
+
+    function changeSpeed1DOF() {
+      animState1DOF.speed = parseFloat(document.getElementById('anim-1dof-speed').value);
+    }
+
+    // Dibujo del esquema físico en Canvas (1 GDL)
+    function drawCanvas1DOF(currentX, maxAmp) {
+      const canvas = document.getElementById('canvas-1dof');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Fondo oscuro
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, w, h);
+
+      // Pared fija a la izquierda
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(15, 10, 10, h - 20);
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      for (let y = 15; y < h - 15; y += 8) {
+        ctx.beginPath();
+        ctx.moveTo(15, y);
+        ctx.lineTo(5, y + 8);
+        ctx.stroke();
+      }
+
+      // Posición del bloque
+      const centerPos = w * 0.55;
+      const scale = (w * 0.35) / (maxAmp > 0 ? maxAmp : 1.0);
+      const massX = centerPos + (currentX * scale);
+
+      // Dibujar Resorte (Zigzag)
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(25, h / 2);
+      const coils = 12;
+      const springLen = massX - 25;
+      for (let i = 1; i <= coils; i++) {
+        const cx = 25 + (springLen / coils) * (i - 0.5);
+        const cy = (h / 2) + (i % 2 === 0 ? 12 : -12);
+        ctx.lineTo(cx, cy);
+      }
+      ctx.lineTo(massX, h / 2);
+      ctx.stroke();
+
+      // Bloque de Masa
+      const blockW = 60;
+      const blockH = 40;
+      ctx.fillStyle = '#2563eb';
+      ctx.strokeStyle = '#60a5fa';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(massX, (h - blockH) / 2, blockW, blockH, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // Texto en la masa
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('m', massX + blockW / 2, h / 2);
+
+      // Flecha de desplazamiento
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px monospace';
+      ctx.fillText(`x = ${(currentX >= 0 ? '+' : '') + currentX.toFixed(3)} m`, massX + blockW / 2, h - 10);
     }
 
     function plot1DOFPhase(x, v) {
@@ -934,14 +1189,10 @@
     function plot1DOFBode(zeta, currR, currM, currPhi) {
       const rArr = [];
       const mArr = [];
-      const phiArr = [];
       for (let r = 0.05; r <= 3.0; r += 0.02) {
         rArr.push(r);
         const denom = Math.sqrt(Math.pow(1 - r*r, 2) + Math.pow(2 * zeta * r, 2));
         mArr.push(1 / denom);
-        let p = Math.atan2(2 * zeta * r, 1 - r*r);
-        if (p < 0) p += 2 * Math.PI;
-        phiArr.push(p * 180 / Math.PI);
       }
 
       const traceM = {
@@ -962,9 +1213,6 @@
         shapes: [{
           type: 'line', x0: 1, x1: 1, y0: 0, y1: Math.max(...mArr),
           line: { color: 'gray', dash: 'dash', width: 1.5 }
-        }],
-        annotations: [{
-          x: 1, y: Math.max(...mArr)*0.9, text: 'Resonancia (r=1)', showarrow: false, font: { color: 'gray' }
         }],
         margin: { l: 45, r: 20, t: 40, b: 40 }
       };
@@ -1001,19 +1249,21 @@
         setVal('param-2dof-m1', 2.0); setVal('param-2dof-m2', 2.0);
         setVal('param-2dof-k1', 40.0); setVal('param-2dof-k2', 20.0); setVal('param-2dof-k3', 40.0);
         setVal('param-2dof-c1', 0.4); setVal('param-2dof-c2', 0.2); setVal('param-2dof-c3', 0.4);
-        setVal('param-2dof-F01', 5.0); setVal('param-2dof-w', 4.47); // wn1 ≈ 4.47 rad/s
+        setVal('param-2dof-F01', 5.0); setVal('param-2dof-w', 4.47);
         setVal('param-2dof-x1-0', 0.0); setVal('param-2dof-x2-0', 0.0);
       } else if (p === 'resonancia2') {
         setVal('param-2dof-m1', 2.0); setVal('param-2dof-m2', 2.0);
         setVal('param-2dof-k1', 40.0); setVal('param-2dof-k2', 20.0); setVal('param-2dof-k3', 40.0);
         setVal('param-2dof-c1', 0.4); setVal('param-2dof-c2', 0.2); setVal('param-2dof-c3', 0.4);
-        setVal('param-2dof-F01', 5.0); setVal('param-2dof-w', 6.32); // wn2 ≈ 6.32 rad/s
+        setVal('param-2dof-F01', 5.0); setVal('param-2dof-w', 6.32);
         setVal('param-2dof-x1-0', 0.0); setVal('param-2dof-x2-0', 0.0);
       }
       update2DOF();
     }
 
     function update2DOF() {
+      stopAnimation2DOF();
+
       const cfg = document.getElementById('config-2dof').value;
       const isFixedFixed = cfg === 'fixed-fixed';
       document.getElementById('box-k3').style.display = isFixedFixed ? 'block' : 'none';
@@ -1044,9 +1294,7 @@
       const C21 = -c2;
       const C22 = c2 + c3;
 
-      // Autovalores analíticos exactos para 2x2: det(K - lambda*M) = 0
-      // (K11 - lambda*m1)*(K22 - lambda*m2) - K12*K21 = 0
-      // m1*m2*lambda^2 - (m1*K22 + m2*K11)*lambda + (K11*K22 - K12*K21) = 0
+      // Autovalores exactos
       const a_eq = m1 * m2;
       const b_eq = -(m1 * K22 + m2 * K11);
       const c_eq = K11 * K22 - K12 * K21;
@@ -1060,7 +1308,6 @@
       const f1 = w1 / (2 * Math.PI);
       const f2 = w2 / (2 * Math.PI);
 
-      // Autovectores (x2 / x1)
       const ratio1 = (K11 - lam1 * m1) / k2;
       const ratio2 = (K11 - lam2 * m1) / k2;
 
@@ -1071,7 +1318,7 @@
       document.getElementById('metric-2dof-ratio1').textContent = `Modo 1: x2/x1 = ${ratio1 >= 0 ? '+' : ''}${ratio1.toFixed(2)} (En fase)`;
       document.getElementById('metric-2dof-ratio2').textContent = `Modo 2: x2/x1 = ${ratio2 >= 0 ? '+' : ''}${ratio2.toFixed(2)} (Contrafase)`;
 
-      // Simulación RK4 para 2 GDL
+      // Simulación RK4
       const tMax = 25.0;
       const N = 2500;
       const dt = tMax / N;
@@ -1109,36 +1356,224 @@
         curr_v2 += (dt / 6) * (k1[3] + 2*k2[3] + 2*k3[3] + k4[3]);
       }
 
-      currentSignal2DOF = { t, x1, x2, v1, v2 };
+      currentSignal2DOF = { t, x1, x2, v1, v2, isFixedFixed };
 
       const max1 = Math.max(...x1.map(Math.abs));
       const max2 = Math.max(...x2.map(Math.abs));
       document.getElementById('metric-2dof-amps').textContent = `|x1|=${max1.toFixed(3)} |x2|=${max2.toFixed(3)} m`;
 
-      plot2DOFTime(t, x1, x2);
+      document.getElementById('anim-2dof-clock').textContent = `⏱️ t = ${tMax.toFixed(1)} s / ${tMax.toFixed(1)} s`;
+
+      plot2DOFTime(t, x1, x2, N - 1);
       plot2DOFModes(ratio1, ratio2, w1, w2, f1, f2);
       plot2DOFOrbit(x1, x2);
+      drawCanvas2DOF(x1[0], x2[0], Math.max(max1, max2), isFixedFixed);
     }
 
-    function plot2DOFTime(t, x1, x2) {
-      const trace1 = {
-        x: t, y: x1, mode: 'lines', name: 'Masa 1: x₁(t)',
-        line: { color: '#2563eb', width: 2.2 }
-      };
-      const trace2 = {
-        x: t, y: x2, mode: 'lines', name: 'Masa 2: x₂(t)',
-        line: { color: '#ea580c', width: 2.2 }
-      };
+    function plot2DOFTime(t, x1, x2, sliceIdx) {
+      if (sliceIdx === undefined || sliceIdx === null) sliceIdx = t.length - 1;
+      sliceIdx = Math.max(1, Math.min(sliceIdx, t.length - 1));
 
+      const subT = t.slice(0, sliceIdx + 1);
+      const subX1 = x1.slice(0, sliceIdx + 1);
+      const subX2 = x2.slice(0, sliceIdx + 1);
+
+      const traces = [
+        {
+          x: subT, y: subX1, mode: 'lines', name: 'Masa 1: x₁(t)',
+          line: { color: '#2563eb', width: 2.2 }
+        },
+        {
+          x: subT, y: subX2, mode: 'lines', name: 'Masa 2: x₂(t)',
+          line: { color: '#ea580c', width: 2.2 }
+        },
+        {
+          x: [t[sliceIdx]], y: [x1[sliceIdx]], mode: 'markers', name: 'Posición M1',
+          marker: { color: '#2563eb', size: 9, line: { color: '#ffffff', width: 2 } },
+          showlegend: false
+        },
+        {
+          x: [t[sliceIdx]], y: [x2[sliceIdx]], mode: 'markers', name: 'Posición M2',
+          marker: { color: '#ea580c', size: 9, line: { color: '#ffffff', width: 2 } },
+          showlegend: false
+        }
+      ];
+
+      const maxAbs = Math.max(0.1, Math.max(...x1.map(Math.abs), ...x2.map(Math.abs)) * 1.25);
       const layout = {
         title: { text: 'Oscilación Temporal de Masas Acopladas: x₁(t) y x₂(t)', font: { size: 14 } },
-        xaxis: { title: 'Tiempo t [s]', zeroline: true },
-        yaxis: { title: 'Desplazamiento [m]', zeroline: true },
+        xaxis: { title: 'Tiempo t [s]', range: [0, t[t.length - 1]], zeroline: true },
+        yaxis: { title: 'Desplazamiento [m]', range: [-maxAbs, maxAbs], zeroline: true },
         margin: { l: 45, r: 20, t: 40, b: 40 },
         legend: { orientation: 'h', y: 1.15, x: 1, xanchor: 'right' }
       };
 
-      Plotly.react('plot-2dof-time', [trace1, trace2], layout, { responsive: true, displayModeBar: false });
+      Plotly.react('plot-2dof-time', traces, layout, { responsive: true, displayModeBar: false });
+    }
+
+    // ANIMACIÓN EN TIEMPO REAL 2 GDL
+    function togglePlay2DOF() {
+      if (animState2DOF.isPlaying) {
+        stopAnimation2DOF();
+      } else {
+        startAnimation2DOF();
+      }
+    }
+
+    function startAnimation2DOF() {
+      const sig = currentSignal2DOF;
+      if (!sig.t || sig.t.length === 0) return;
+
+      animState2DOF.isPlaying = true;
+      document.getElementById('btn-2dof-icon').textContent = '⏸️';
+      document.getElementById('btn-2dof-text').textContent = 'Pausar';
+
+      if (animState2DOF.currentFrame >= sig.t.length - 1) {
+        animState2DOF.currentFrame = 0;
+      }
+
+      animState2DOF.lastTimestamp = performance.now();
+
+      function step(now) {
+        if (!animState2DOF.isPlaying) return;
+
+        const dtReal = (now - animState2DOF.lastTimestamp) / 1000;
+        animState2DOF.lastTimestamp = now;
+
+        const simDt = sig.t[1] - sig.t[0];
+        const framesToAdvance = Math.max(1, Math.round((dtReal * animState2DOF.speed) / simDt));
+
+        animState2DOF.currentFrame = Math.min(sig.t.length - 1, animState2DOF.currentFrame + framesToAdvance);
+
+        const currIdx = animState2DOF.currentFrame;
+        const currT = sig.t[currIdx];
+        const totalT = sig.t[sig.t.length - 1];
+
+        document.getElementById('anim-2dof-clock').textContent = `⏱️ t = ${currT.toFixed(2)} s / ${totalT.toFixed(1)} s`;
+
+        plot2DOFTime(sig.t, sig.x1, sig.x2, currIdx);
+        drawCanvas2DOF(sig.x1[currIdx], sig.x2[currIdx], Math.max(0.1, Math.max(...sig.x1.map(Math.abs), ...sig.x2.map(Math.abs))), sig.isFixedFixed);
+
+        if (animState2DOF.currentFrame < sig.t.length - 1) {
+          animState2DOF.reqId = requestAnimationFrame(step);
+        } else {
+          stopAnimation2DOF();
+          document.getElementById('btn-2dof-icon').textContent = '🔄';
+          document.getElementById('btn-2dof-text').textContent = 'Reiniciar Oscilación 2 GDL';
+        }
+      }
+
+      animState2DOF.reqId = requestAnimationFrame(step);
+    }
+
+    function stopAnimation2DOF() {
+      animState2DOF.isPlaying = false;
+      if (animState2DOF.reqId) {
+        cancelAnimationFrame(animState2DOF.reqId);
+        animState2DOF.reqId = null;
+      }
+      document.getElementById('btn-2dof-icon').textContent = '▶️';
+      document.getElementById('btn-2dof-text').textContent = 'Iniciar Oscilación 2 GDL';
+    }
+
+    function showFullPlot2DOF() {
+      stopAnimation2DOF();
+      const sig = currentSignal2DOF;
+      if (!sig.t || sig.t.length === 0) return;
+      animState2DOF.currentFrame = sig.t.length - 1;
+      document.getElementById('anim-2dof-clock').textContent = `⏱️ t = ${sig.t[sig.t.length - 1].toFixed(1)} s / ${sig.t[sig.t.length - 1].toFixed(1)} s`;
+      plot2DOFTime(sig.t, sig.x1, sig.x2, sig.t.length - 1);
+      drawCanvas2DOF(sig.x1[sig.t.length - 1], sig.x2[sig.t.length - 1], Math.max(0.1, Math.max(...sig.x1.map(Math.abs), ...sig.x2.map(Math.abs))), sig.isFixedFixed);
+    }
+
+    function changeSpeed2DOF() {
+      animState2DOF.speed = parseFloat(document.getElementById('anim-2dof-speed').value);
+    }
+
+    // Dibujo del esquema físico en Canvas (2 GDL)
+    function drawCanvas2DOF(currentX1, currentX2, maxAmp, isFixedFixed) {
+      const canvas = document.getElementById('canvas-2dof');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Fondo oscuro
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, w, h);
+
+      // Pared izquierda
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(15, 10, 10, h - 20);
+
+      // Pared derecha (si es fixed-fixed)
+      if (isFixedFixed) {
+        ctx.fillRect(w - 25, 10, 10, h - 20);
+      }
+
+      const blockW = 50;
+      const blockH = 38;
+      const scale = (w * 0.16) / (maxAmp > 0 ? maxAmp : 1.0);
+
+      const m1Base = w * 0.32;
+      const m2Base = w * 0.65;
+
+      const m1X = m1Base + (currentX1 * scale);
+      const m2X = m2Base + (currentX2 * scale);
+
+      // Helper para dibujar resorte
+      const drawSpring = (startX, endX, color) => {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(startX, h / 2);
+        const coils = 10;
+        const len = endX - startX;
+        for (let i = 1; i <= coils; i++) {
+          const cx = startX + (len / coils) * (i - 0.5);
+          const cy = (h / 2) + (i % 2 === 0 ? 10 : -10);
+          ctx.lineTo(cx, cy);
+        }
+        ctx.lineTo(endX, h / 2);
+        ctx.stroke();
+      };
+
+      // Resorte 1 (Pared a M1)
+      drawSpring(25, m1X, '#38bdf8');
+
+      // Resorte 2 (M1 a M2)
+      drawSpring(m1X + blockW, m2X, '#c084fc');
+
+      // Resorte 3 (M2 a Pared derecha si fixed-fixed)
+      if (isFixedFixed) {
+        drawSpring(m2X + blockW, w - 25, '#fb923c');
+      }
+
+      // Bloque Masa 1
+      ctx.fillStyle = '#2563eb';
+      ctx.strokeStyle = '#60a5fa';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(m1X, (h - blockH) / 2, blockW, blockH, 5);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('m₁', m1X + blockW / 2, h / 2);
+
+      // Bloque Masa 2
+      ctx.fillStyle = '#ea580c';
+      ctx.strokeStyle = '#fb923c';
+      ctx.beginPath();
+      ctx.roundRect(m2X, (h - blockH) / 2, blockW, blockH, 5);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('m₂', m2X + blockW / 2, h / 2);
     }
 
     function plot2DOFModes(r1, r2, w1, w2, f1, f2) {
@@ -1203,7 +1638,6 @@
         t = currentSignal2DOF.t;
         x = currentSignal2DOF.x2;
       } else {
-        // Señal demo sintética
         t = [];
         x = [];
         for (let i = 0; i < 1500; i++) {
@@ -1223,8 +1657,6 @@
       const dt = t[1] - t[0];
       const fs = 1 / dt;
 
-      // Cálculo de DFT unilateral
-      // Usamos una muestra optimizada hasta fs/2
       const numFreqs = Math.min(400, Math.floor(N / 2));
       const freqHz = [];
       const freqRad = [];
@@ -1236,7 +1668,6 @@
         freqHz.push(f_hz);
         freqRad.push(f_hz * 2 * Math.PI);
 
-        // DFT acumulativa
         let re = 0, im = 0;
         const angleStep = (2 * Math.PI * k) / N;
         for (let n = 0; n < N; n++) {
@@ -1246,22 +1677,19 @@
         }
 
         let mag = (2.0 / N) * Math.sqrt(re*re + im*im);
-        if (k === 0) mag /= 2.0; // Componente DC
+        if (k === 0) mag /= 2.0;
         amp.push(mag);
         phaseRad.push(Math.atan2(im, re));
       }
 
-      // Componente DC
       const dcVal = amp[0];
 
-      // Ordenar componentes AC por amplitud descendente para seleccionar los Top N
       const acIndices = [];
       for (let i = 1; i < numFreqs; i++) acIndices.push(i);
       acIndices.sort((a, b) => amp[b] - amp[a]);
 
       const selectedIndices = acIndices.slice(0, numComp);
 
-      // Reconstrucción analítica armónica
       const xRec = new Array(N).fill(dcVal);
       const componentsInfo = [];
       let selectedEnergy = 0;
@@ -1287,7 +1715,6 @@
         });
       });
 
-      // Cálculo de métricas
       let sse = 0, sst = 0;
       const xMean = x.reduce((a, b) => a + b, 0) / N;
       const residual = new Array(N);
@@ -1307,14 +1734,12 @@
       for (let i = 1; i < numFreqs; i++) totalEnergy += amp[i] * amp[i];
       const energyPct = totalEnergy > 1e-9 ? Math.min(100, (selectedEnergy / totalEnergy) * 100) : 100;
 
-      // Actualizar tarjetas
       document.getElementById('metric-fourier-n').innerHTML = `${numComp} <span class="text-xs font-normal text-slate-500">picos</span>`;
       document.getElementById('metric-fourier-r2').textContent = r2.toFixed(4);
       document.getElementById('metric-fourier-quality').textContent = r2 > 0.95 ? 'Excelente ajuste' : 'Aproximado';
       document.getElementById('metric-fourier-rmse').textContent = rmse.toExponential(2);
       document.getElementById('metric-fourier-energy').textContent = `${energyPct.toFixed(2)} %`;
 
-      // Graficar
       plotFourierSpectrum(isRad ? freqRad : freqHz, amp, componentsInfo, isRad);
       plotFourierRecon(t, x, xRec, residual, numComp, r2);
       buildFourierTable(componentsInfo, dcVal, numComp);
@@ -1410,7 +1835,6 @@
 
     // Inicializar al cargar
     window.addEventListener('DOMContentLoaded', () => {
-      // Renderizar fórmulas LaTeX estáticas
       renderMathInElement(document.body, {
         delimiters: [
           {left: '$$', right: '$$', display: true},
