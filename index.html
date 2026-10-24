@@ -42,7 +42,7 @@
         <span class="text-2xl">⚙️</span>
         <div>
           <h1 class="text-lg font-bold tracking-tight text-white leading-tight">Simulador de Oscilaciones</h1>
-          <p class="text-xs text-slate-400">1 y 2 GDL • Vibraciones Libres, Forzadas, Animación y Fourier</p>
+          <p class="text-xs text-slate-400">1 y 2 GDL • Vibraciones Libres y Amortiguadas, Animación y Fourier</p>
         </div>
       </div>
       
@@ -61,11 +61,6 @@
           📖 Teoría y Fórmulas
         </button>
       </nav>
-
-      <a href="https://github.com/dmunoz-utal/Oscilaciones_clases" target="_blank" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-md flex items-center gap-1.5 border border-slate-700">
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path></svg>
-        GitHub
-      </a>
     </div>
 
     <!-- Mobile Navigation -->
@@ -91,7 +86,7 @@
           <span>🔵</span> Sistema de 1 Grado de Libertad (1 GDL)
         </h2>
         <p class="text-sm text-blue-100 mt-1">
-          Ecuación: \( m \ddot{x}(t) + c \dot{x}(t) + k x(t) = F_0 \cos(\omega t) \). Modifica los parámetros, observa las métricas en tiempo real o presiona <b>Iniciar Oscilación</b> para ver la curva \(x(t)\) dibujarse en directo.
+          Ecuación: \( m \ddot{x}(t) + c \dot{x}(t) + k x(t) = 0 \). Modifica los parámetros físicos o condiciones iniciales y presiona <b>Iniciar Oscilación</b> para ver la curva \(x(t)\) dibujarse en tiempo real.
         </p>
       </div>
 
@@ -108,8 +103,6 @@
                 <option value="noamort">2. Libre No Amortiguada (c = 0)</option>
                 <option value="critico">3. Críticamente Amortiguada (ζ = 1)</option>
                 <option value="sobreamort">4. Sobreamortiguada (ζ > 1)</option>
-                <option value="resonancia">5. Resonancia Armónica (ω = ωn)</option>
-                <option value="aislamiento">6. Aislamiento de Vibraciones (ω >> ωn)</option>
               </select>
             </div>
 
@@ -141,40 +134,6 @@
                   <span class="font-bold text-blue-600" id="val-1dof-c">2.0 N·s/m</span>
                 </div>
                 <input type="range" id="param-1dof-c" min="0" max="40" step="0.2" value="2.0" oninput="update1DOF()" class="w-full">
-              </div>
-            </div>
-
-            <hr class="border-slate-100">
-
-            <!-- Fuerza Externa -->
-            <div class="space-y-3">
-              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Fuerza Externa \(F(t) = F_0 \cos(\omega t)\)</h3>
-              
-              <div class="flex items-center gap-3">
-                <label class="text-xs font-medium flex items-center gap-1.5 cursor-pointer">
-                  <input type="radio" name="force-1dof-type" value="free" checked onchange="toggleForce1DOF()"> Libre (\(F_0=0\))
-                </label>
-                <label class="text-xs font-medium flex items-center gap-1.5 cursor-pointer">
-                  <input type="radio" name="force-1dof-type" value="forced" onchange="toggleForce1DOF()"> Forzada Armónica
-                </label>
-              </div>
-
-              <div id="box-force-1dof" class="hidden space-y-3 pt-2">
-                <div>
-                  <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
-                    <span>Amplitud \(F_0\):</span>
-                    <span class="font-bold text-emerald-600" id="val-1dof-F0">5.0 N</span>
-                  </div>
-                  <input type="range" id="param-1dof-F0" min="0" max="50" step="0.5" value="5.0" oninput="update1DOF()" class="w-full">
-                </div>
-
-                <div>
-                  <div class="flex justify-between text-xs font-medium text-slate-700 mb-1">
-                    <span>Frecuencia \(\omega\):</span>
-                    <span class="font-bold text-emerald-600" id="val-1dof-w">5.0 rad/s</span>
-                  </div>
-                  <input type="range" id="param-1dof-w" min="0.5" max="25" step="0.1" value="5.0" oninput="update1DOF()" class="w-full">
-                </div>
               </div>
             </div>
 
@@ -229,9 +188,9 @@
             </div>
 
             <div class="card-metric p-3" style="border-left-color: #f59e0b;">
-              <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Amplitud / Desfase</div>
+              <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Amplitud Máx / Inicial</div>
               <div class="text-lg font-bold text-slate-900 mt-0.5" id="metric-1dof-amp">0.200 m</div>
-              <div class="text-[11px] text-slate-400" id="metric-1dof-phase">Fase: 0.0°</div>
+              <div class="text-[11px] text-slate-400" id="metric-1dof-phase">x(0)=0.20 m, v(0)=0.0 m/s</div>
             </div>
           </div>
 
@@ -244,9 +203,6 @@
                 </button>
                 <button onclick="switchSubTab1DOF('phase')" id="subtab-1dof-phase" class="px-3 py-2 text-slate-600 hover:text-slate-900">
                   🌀 Diagrama de Fase (x vs v)
-                </button>
-                <button onclick="switchSubTab1DOF('bode')" id="subtab-1dof-bode" class="px-3 py-2 text-slate-600 hover:text-slate-900">
-                  🎯 Curva de Resonancia M(r)
                 </button>
               </div>
 
@@ -304,7 +260,6 @@
               <!-- PLOTS -->
               <div id="plot-1dof-time" class="w-full h-[450px]"></div>
               <div id="plot-1dof-phase" class="w-full h-[450px] hidden"></div>
-              <div id="plot-1dof-bode" class="w-full h-[450px] hidden"></div>
             </div>
           </div>
 
@@ -325,7 +280,7 @@
           <span>🟣</span> Sistema de 2 Grados de Libertad (2 GDL)
         </h2>
         <p class="text-sm text-purple-100 mt-1">
-          Ecuación matricial: \( \mathbf{M} \ddot{\mathbf{x}} + \mathbf{C} \dot{\mathbf{x}} + \mathbf{K} \mathbf{x} = \mathbf{F}(t) \). Modos normales de vibración, frecuencias acopladas y batimientos animados.
+          Ecuación matricial: \( \mathbf{M} \ddot{\mathbf{x}} + \mathbf{C} \dot{\mathbf{x}} + \mathbf{K} \mathbf{x} = \mathbf{0} \). Modos normales de vibración, frecuencias naturales y batimientos animados en vibración libre.
         </p>
       </div>
 
@@ -349,8 +304,7 @@
                 <option value="batimiento">1. Batimiento / Transferencia de Energía</option>
                 <option value="modo1">2. Modo 1 Puro (En fase)</option>
                 <option value="modo2">3. Modo 2 Puro (En contrafase)</option>
-                <option value="resonancia1">4. Resonancia en Modo 1 (ω = ωn1)</option>
-                <option value="resonancia2">5. Resonancia en Modo 2 (ω = ωn2)</option>
+                <option value="amortiguado">4. Libre Amortiguada (c > 0)</option>
               </select>
             </div>
 
@@ -405,21 +359,6 @@
                 <div id="box-c3">
                   <label class="text-xs text-slate-600">\(c_3\):</label>
                   <input type="number" id="param-2dof-c3" value="0.0" step="0.1" min="0" oninput="update2DOF()" class="w-full text-sm border rounded p-1 bg-slate-50">
-                </div>
-              </div>
-            </div>
-
-            <!-- Excitación -->
-            <div class="space-y-3">
-              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Fuerzas Externas</h3>
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="text-xs text-slate-600">\(F_{01}\) sobre \(m_1\) [N]:</label>
-                  <input type="number" id="param-2dof-F01" value="0.0" step="1" min="0" oninput="update2DOF()" class="w-full text-sm border rounded p-1 bg-slate-50">
-                </div>
-                <div>
-                  <label class="text-xs text-slate-600">Frec. \(\omega\) [rad/s]:</label>
-                  <input type="number" id="param-2dof-w" value="0.0" step="0.2" min="0" oninput="update2DOF()" class="w-full text-sm border rounded p-1 bg-slate-50">
                 </div>
               </div>
             </div>
@@ -722,43 +661,51 @@
         <h2 class="text-2xl font-bold text-slate-900 border-b pb-3">📖 Fundamentos Teóricos de Vibraciones y Fourier</h2>
 
         <div class="space-y-3">
-          <h3 class="text-lg font-bold text-blue-600">1. Sistema de 1 Grado de Libertad</h3>
+          <h3 class="text-lg font-bold text-blue-600">1. Sistema de 1 Grado de Libertad (Vibración Libre y Amortiguada)</h3>
           <p class="text-sm text-slate-600 leading-relaxed">
-            La 2ª Ley de Newton para un sistema masa-resorte-amortiguador sometido a una fuerza armónica establece:
+            La 2ª Ley de Newton para un oscilador masa-resorte con amortiguamiento viscoso en vibración libre establece:
           </p>
           <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono">
-            $$m \ddot{x}(t) + c \dot{x}(t) + k x(t) = F_0 \cos(\omega t)$$
+            $$m \ddot{x}(t) + c \dot{x}(t) + k x(t) = 0 \quad \iff \quad \ddot{x}(t) + 2\zeta \omega_n \dot{x}(t) + \omega_n^2 x(t) = 0$$
           </div>
           <p class="text-sm text-slate-600">
-            Definiendo la frecuencia natural \(\omega_n = \sqrt{k/m}\) y la razón de amortiguamiento \(\zeta = \frac{c}{2\sqrt{km}}\):
+            Con frecuencia natural \(\omega_n = \sqrt{k/m}\) y razón de amortiguamiento \(\zeta = \frac{c}{2\sqrt{km}} = \frac{c}{c_c}\), el movimiento ante condiciones iniciales \(x(0)=x_0\) y \(\dot{x}(0)=v_0\) se clasifica en:
           </p>
           <ul class="list-disc list-inside text-xs text-slate-600 space-y-1.5 ml-2">
-            <li><strong>Subamortiguado (\(0 < \zeta < 1\)):</strong> Movimiento oscilatorio armónico con envolvente exponencial decreciente \(e^{-\zeta \omega_n t}\) a la frecuencia amortiguada \(\omega_d = \omega_n \sqrt{1 - \zeta^2}\).</li>
-            <li><strong>Críticamente amortiguado (\(\zeta = 1\)):</strong> Regreso más rápido al equilibrio sin oscilación.</li>
-            <li><strong>Sobreamortiguado (\(\zeta > 1\)):</strong> Respuesta lenta y aperiódica sin oscilación.</li>
-            <li><strong>Factor de Amplificación Dinámica \(M(r)\):</strong> Para \(r = \omega / \omega_n\), \(M(r) = \frac{1}{\sqrt{(1-r^2)^2 + (2\zeta r)^2}}\). En resonancia (\(r=1\)), \(M = 1/(2\zeta)\).</li>
+            <li><strong>Libre No Amortiguado (\(c = 0, \zeta = 0\)):</strong> Oscilación armónica pura indefinida: \(x(t) = x_0 \cos(\omega_n t) + \frac{v_0}{\omega_n} \sin(\omega_n t) = X_0 \cos(\omega_n t - \phi_0)\).</li>
+            <li><strong>Subamortiguado (\(0 < \zeta < 1\)):</strong> Oscilación sinusoidal con envolvente exponencial decreciente \(\pm C e^{-\zeta \omega_n t}\) a la frecuencia amortiguada \(\omega_d = \omega_n \sqrt{1 - \zeta^2}\):
+              $$x(t) = e^{-\zeta \omega_n t} \left( x_0 \cos(\omega_d t) + \frac{v_0 + \zeta \omega_n x_0}{\omega_d} \sin(\omega_d t) \right)$$
+            </li>
+            <li><strong>Críticamente Amortiguado (\(\zeta = 1, c = c_c = 2\sqrt{km}\)):</strong> Retorno óptimo y más rápido al equilibrio estático sin oscilar (\(x(t) = (x_0 + (v_0 + \omega_n x_0)t)e^{-\omega_n t}\)).</li>
+            <li><strong>Sobreamortiguado (\(\zeta > 1, c > c_c\)):</strong> Disipación excesiva con respuesta aperiódica lenta formada por la suma de dos exponenciales reales decrecientes.</li>
           </ul>
         </div>
 
         <hr class="border-slate-100">
 
         <div class="space-y-3">
-          <h3 class="text-lg font-bold text-purple-600">2. Sistema de 2 Grados de Libertad</h3>
+          <h3 class="text-lg font-bold text-purple-600">2. Sistema de 2 Grados de Libertad (Vibración Libre Acoplada)</h3>
           <p class="text-sm text-slate-600 leading-relaxed">
-            Las ecuaciones acopladas en formato matricial son:
+            Las ecuaciones de movimiento acopladas para dos masas vibrando libremente se expresan en forma matricial homogénea:
           </p>
           <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono">
-            $$\mathbf{M} \ddot{\mathbf{x}} + \mathbf{C} \dot{\mathbf{x}} + \mathbf{K} \mathbf{x} = \mathbf{F}(t)$$
+            $$\mathbf{M} \ddot{\mathbf{x}} + \mathbf{C} \dot{\mathbf{x}} + \mathbf{K} \mathbf{x} = \mathbf{0}$$
           </div>
           <p class="text-sm text-slate-600">
-            Para vibración libre no amortiguada, proponiendo solución armónica \(\mathbf{x}(t) = \boldsymbol{\phi} e^{i \omega t}\), se obtiene el problema de autovalores generalizado:
+            Para el sistema conservativo (\(\mathbf{C} = \mathbf{0}\)), proponiendo la forma armónica \(\mathbf{x}(t) = \boldsymbol{\phi} e^{i \omega t}\), se obtiene la ecuación característica:
           </p>
           <div class="p-3 bg-slate-50 rounded-lg text-center text-sm font-mono">
             $$\det(\mathbf{K} - \omega^2 \mathbf{M}) = 0$$
           </div>
           <p class="text-sm text-slate-600">
-            Cuyas soluciones entregan las frecuencias naturales \(\omega_{n1}\) (primer modo, movimiento en fase) y \(\omega_{n2}\) (segundo modo, movimiento en contrafase).
+            Esta ecuación entrega dos frecuencias naturales (\(\omega_{n1}\) y \(\omega_{n2}\)) y sus respectivos modos normales de vibración (autovectores \(\boldsymbol{\phi}_1, \boldsymbol{\phi}_2\)):
           </p>
+          <ul class="list-disc list-inside text-xs text-slate-600 space-y-1.5 ml-2">
+            <li><strong>Primer Modo (\(\omega_{n1}\)):</strong> Ambas masas oscilan en la misma dirección (en fase).</li>
+            <li><strong>Segundo Modo (\(\omega_{n2}\)):</strong> Las masas oscilan en sentidos opuestos (en contrafase), existiendo un punto nodal intermedio.</li>
+            <li><strong>Batimiento (Transferencia de Energía):</strong> Al excitar una sola masa (\(x_1(0) > 0, x_2(0) = 0\)), se produce una modulación de amplitud donde la energía oscila continuamente de una masa a la otra a la frecuencia de batimiento \(\omega_b = |\omega_{n2} - \omega_{n1}| / 2\).</li>
+            <li><strong>Amortiguamiento:</strong> La matriz \(\mathbf{C}\) disipa gradualmente la energía mecánica, reduciendo las amplitudes de ambos modos hasta el reposo.</li>
+          </ul>
         </div>
 
         <hr class="border-slate-100">
@@ -785,7 +732,7 @@
   <!-- JAVASCRIPT SIMULATION & GRAPHICS LOGIC -->
   <script>
     // Variables globales de señales simuladas
-    let currentSignal1DOF = { t: [], x: [], v: [], F: [], k: 50, F0: 0, zeta: 0, wn: 5, wd: 0, x0: 0.2, v0: 0 };
+    let currentSignal1DOF = { t: [], x: [], v: [], k: 50, zeta: 0, wn: 5, wd: 0, x0: 0.2, v0: 0 };
     let currentSignal2DOF = { t: [], x1: [], x2: [], v1: [], v2: [], isFixedFixed: true };
 
     // Estados de animación
@@ -914,7 +861,7 @@
       delete plotZoomState[plotId];
       if (plotId === 'plot-1dof-time' && currentSignal1DOF.t) {
         const sig = currentSignal1DOF;
-        plot1DOFTime(sig.t, sig.x, sig.v, sig.F, sig.k, sig.F0, sig.zeta, sig.wn, sig.wd, sig.x0, sig.v0, animState1DOF.currentFrame);
+        plot1DOFTime(sig.t, sig.x, sig.v, sig.zeta, sig.wn, sig.wd, sig.x0, sig.v0, animState1DOF.currentFrame);
       } else if (plotId === 'plot-2dof-time' && currentSignal2DOF.t) {
         const sig = currentSignal2DOF;
         plot2DOFTime(sig.t, sig.x1, sig.x2, animState2DOF.currentFrame);
@@ -928,12 +875,16 @@
 
     function switchSubTab1DOF(subId) {
       currentSubTab1DOF = subId;
-      ['time', 'phase', 'bode'].forEach(id => {
-        document.getElementById(`plot-1dof-${id}`).classList.add('hidden');
-        document.getElementById(`subtab-1dof-${id}`).classList.remove('border-b-2', 'border-blue-600', 'text-blue-600', 'bg-white');
+      ['time', 'phase'].forEach(id => {
+        const el = document.getElementById(`plot-1dof-${id}`);
+        if (el) el.classList.add('hidden');
+        const tab = document.getElementById(`subtab-1dof-${id}`);
+        if (tab) tab.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600', 'bg-white');
       });
-      document.getElementById(`plot-1dof-${subId}`).classList.remove('hidden');
-      document.getElementById(`subtab-1dof-${subId}`).classList.add('border-b-2', 'border-blue-600', 'text-blue-600', 'bg-white');
+      const activePlot = document.getElementById(`plot-1dof-${subId}`);
+      if (activePlot) activePlot.classList.remove('hidden');
+      const activeTab = document.getElementById(`subtab-1dof-${subId}`);
+      if (activeTab) activeTab.classList.add('border-b-2', 'border-blue-600', 'text-blue-600', 'bg-white');
       Plotly.Plots.resize(`plot-1dof-${subId}`);
     }
 
@@ -1004,7 +955,7 @@
       document.getElementById('anim-1dof-clock').textContent = `⏱️ t = 0.00 s / ${totalT.toFixed(1)} s`;
       document.getElementById('btn-1dof-icon').textContent = '▶️';
       document.getElementById('btn-1dof-text').textContent = 'Iniciar Oscilación en Tiempo Real';
-      plot1DOFTime(sig.t, sig.x, sig.v, sig.F, sig.k, sig.F0, sig.zeta, sig.wn, sig.wd, sig.x0, sig.v0, 0);
+      plot1DOFTime(sig.t, sig.x, sig.v, sig.zeta, sig.wn, sig.wd, sig.x0, sig.v0, 0);
       drawCanvas1DOF(sig.x[0], Math.max(0.1, Math.max(...sig.x.map(Math.abs))));
     }
 
@@ -1021,14 +972,8 @@
       drawCanvas2DOF(sig.x1[0], sig.x2[0], Math.max(0.1, Math.max(...sig.x1.map(Math.abs), ...sig.x2.map(Math.abs))), sig.isFixedFixed);
     }
 
-    function toggleForce1DOF() {
-      const isForced = document.querySelector('input[name="force-1dof-type"]:checked').value === 'forced';
-      document.getElementById('box-force-1dof').classList.toggle('hidden', !isForced);
-      update1DOF();
-    }
-
     // ==============================================================
-    // LÓGICA FÍSICA: 1 GRADO DE LIBERTAD (1 GDL)
+    // LÓGICA FÍSICA: 1 GRADO DE LIBERTAD (1 GDL) - VIBRACIÓN LIBRE Y AMORTIGUADA
     // ==============================================================
     function applyPreset1DOF() {
       const p = document.getElementById('preset-1dof').value;
@@ -1036,32 +981,18 @@
 
       if (p === 'subamort') {
         setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 2.0);
-        document.querySelector('input[name="force-1dof-type"][value="free"]').checked = true;
         setVal('param-1dof-x0', 0.20); setVal('param-1dof-v0', 0.0);
       } else if (p === 'noamort') {
         setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 0.0);
-        document.querySelector('input[name="force-1dof-type"][value="free"]').checked = true;
         setVal('param-1dof-x0', 0.20); setVal('param-1dof-v0', 0.0);
       } else if (p === 'critico') {
         setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 20.0);
-        document.querySelector('input[name="force-1dof-type"][value="free"]').checked = true;
         setVal('param-1dof-x0', 0.20); setVal('param-1dof-v0', 0.0);
       } else if (p === 'sobreamort') {
         setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 35.0);
-        document.querySelector('input[name="force-1dof-type"][value="free"]').checked = true;
         setVal('param-1dof-x0', 0.20); setVal('param-1dof-v0', 0.5);
-      } else if (p === 'resonancia') {
-        setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 1.5);
-        document.querySelector('input[name="force-1dof-type"][value="forced"]').checked = true;
-        setVal('param-1dof-F0', 8.0); setVal('param-1dof-w', 5.0);
-        setVal('param-1dof-x0', 0.0); setVal('param-1dof-v0', 0.0);
-      } else if (p === 'aislamiento') {
-        setVal('param-1dof-m', 2.0); setVal('param-1dof-k', 50.0); setVal('param-1dof-c', 2.0);
-        document.querySelector('input[name="force-1dof-type"][value="forced"]').checked = true;
-        setVal('param-1dof-F0', 15.0); setVal('param-1dof-w', 15.0);
-        setVal('param-1dof-x0', 0.0); setVal('param-1dof-v0', 0.0);
       }
-      toggleForce1DOF();
+      update1DOF();
     }
 
     function update1DOF() {
@@ -1070,9 +1001,6 @@
       const m = parseFloat(document.getElementById('param-1dof-m').value);
       const k = parseFloat(document.getElementById('param-1dof-k').value);
       const c = parseFloat(document.getElementById('param-1dof-c').value);
-      const isForced = document.querySelector('input[name="force-1dof-type"]:checked').value === 'forced';
-      const F0 = isForced ? parseFloat(document.getElementById('param-1dof-F0').value) : 0.0;
-      const omega = isForced ? parseFloat(document.getElementById('param-1dof-w').value) : 0.0;
       const x0 = parseFloat(document.getElementById('param-1dof-x0').value);
       const v0 = parseFloat(document.getElementById('param-1dof-v0').value);
       const tMax = parseFloat(document.getElementById('param-1dof-tmax').value);
@@ -1080,16 +1008,14 @@
       document.getElementById('val-1dof-m').textContent = `${m.toFixed(1)} kg`;
       document.getElementById('val-1dof-k').textContent = `${k.toFixed(1)} N/m`;
       document.getElementById('val-1dof-c').textContent = `${c.toFixed(1)} N·s/m`;
-      document.getElementById('val-1dof-F0').textContent = `${F0.toFixed(1)} N`;
-      document.getElementById('val-1dof-w').textContent = `${omega.toFixed(1)} rad/s`;
       document.getElementById('val-1dof-tmax').textContent = `${tMax.toFixed(0)} s`;
 
-      // Cálculos teóricos
+      // Cálculos teóricos de vibración libre
       const wn = Math.sqrt(k / m);
       const fn = wn / (2 * Math.PI);
       const cc = 2 * Math.sqrt(k * m);
       const zeta = c / cc;
-      const wd = zeta < 1.0 ? wn * Math.sqrt(1 - zeta * zeta) : 0.0;
+      const wd = zeta < 1.0 ? wn * Math.sqrt(Math.max(0, 1 - zeta * zeta)) : 0.0;
       const fd = wd / (2 * Math.PI);
 
       let regime = "No amortiguado (ζ = 0)";
@@ -1104,25 +1030,12 @@
       document.getElementById('metric-1dof-wd').innerHTML = `${wd.toFixed(2)} <span class="text-xs font-normal text-slate-500">rad/s</span>`;
       document.getElementById('metric-1dof-fd').textContent = `${fd.toFixed(2)} Hz`;
 
-      // Régimen permanente bajo fuerza armónica
-      let r = 0, M = 1, X_steady = 0, phi_deg = 0;
-      if (F0 > 0 && omega > 0) {
-        r = omega / wn;
-        const denom = Math.sqrt(Math.pow(1 - r*r, 2) + Math.pow(2 * zeta * r, 2));
-        M = 1 / denom;
-        X_steady = (F0 / k) * M;
-        let phi_rad = Math.atan2(2 * zeta * r, 1 - r*r);
-        if (phi_rad < 0) phi_rad += 2 * Math.PI;
-        phi_deg = phi_rad * (180 / Math.PI);
-      }
-
-      // Simulación numérica RK4
+      // Simulación numérica RK4 para vibración libre homogénea: m x'' + c x' + k x = 0
       const N = 2000;
       const dt = tMax / N;
       const t = new Array(N);
       const x = new Array(N);
       const v = new Array(N);
-      const F = new Array(N);
 
       let curr_x = x0;
       let curr_v = v0;
@@ -1132,14 +1045,9 @@
         t[i] = time;
         x[i] = curr_x;
         v[i] = curr_v;
-        const f_val = F0 * Math.cos(omega * time);
-        F[i] = f_val;
 
-        // Derivada: [v, (F - c*v - k*x)/m]
-        const f_eval = (tm, px, pv) => {
-          const ft = F0 * Math.cos(omega * tm);
-          return [pv, (ft - c * pv - k * px) / m];
-        };
+        // Derivada libre: [v, (- c*v - k*x)/m]
+        const f_eval = (tm, px, pv) => [pv, (- c * pv - k * px) / m];
 
         const k1 = f_eval(time, curr_x, curr_v);
         const k2 = f_eval(time + 0.5*dt, curr_x + 0.5*dt*k1[0], curr_v + 0.5*dt*k1[1]);
@@ -1150,32 +1058,25 @@
         curr_v += (dt / 6) * (k1[1] + 2*k2[1] + 2*k3[1] + k4[1]);
       }
 
-      currentSignal1DOF = { t, x, v, F, k, F0, zeta, wn, wd, x0, v0 };
+      currentSignal1DOF = { t, x, v, k, zeta, wn, wd, x0, v0 };
 
       // Actualizar tarjeta amplitud
       const maxObs = Math.max(...x.map(Math.abs));
-      if (F0 > 0) {
-        document.getElementById('metric-1dof-amp').textContent = `${X_steady.toFixed(3)} m`;
-        document.getElementById('metric-1dof-phase').textContent = `Fase φ: ${phi_deg.toFixed(1)}° (r = ${r.toFixed(2)})`;
-      } else {
-        document.getElementById('metric-1dof-amp').textContent = `${maxObs.toFixed(3)} m`;
-        document.getElementById('metric-1dof-phase').textContent = `Libre (Amplitud máx observada)`;
-      }
+      document.getElementById('metric-1dof-amp').textContent = `${maxObs.toFixed(3)} m`;
+      document.getElementById('metric-1dof-phase').textContent = `x₀ = ${x0.toFixed(2)} m, v₀ = ${v0.toFixed(2)} m/s`;
 
       // Reiniciar zoom y reloj
       delete plotZoomState['plot-1dof-time'];
       delete plotZoomState['plot-1dof-phase'];
-      delete plotZoomState['plot-1dof-bode'];
       document.getElementById('anim-1dof-clock').textContent = `⏱️ t = ${tMax.toFixed(1)} s / ${tMax.toFixed(1)} s`;
 
       // Graficar
-      plot1DOFTime(t, x, v, F, k, F0, zeta, wn, wd, x0, v0, N - 1);
+      plot1DOFTime(t, x, v, zeta, wn, wd, x0, v0, N - 1);
       plot1DOFPhase(x, v);
-      plot1DOFBode(zeta, r, M, phi_deg);
       drawCanvas1DOF(x[0], maxObs);
     }
 
-    function plot1DOFTime(t, x, v, F, k, F0, zeta, wn, wd, x0, v0, sliceIdx) {
+    function plot1DOFTime(t, x, v, zeta, wn, wd, x0, v0, sliceIdx) {
       if (sliceIdx === undefined || sliceIdx === null) sliceIdx = t.length - 1;
       sliceIdx = Math.max(1, Math.min(sliceIdx, t.length - 1));
 
@@ -1194,8 +1095,8 @@
         }
       ];
 
-      // Envolvente analítica
-      if (F0 === 0 && zeta > 0 && zeta < 1 && wd > 0) {
+      // Envolvente analítica en vibración libre subamortiguada
+      if (zeta > 0 && zeta < 1 && wd > 0) {
         const C = Math.sqrt(x0*x0 + Math.pow((v0 + zeta*wn*x0)/wd, 2));
         const envPos = t.map(tm => C * Math.exp(-zeta * wn * tm));
         const envNeg = envPos.map(val => -val);
@@ -1206,15 +1107,6 @@
         traces.push({
           x: t, y: envNeg, mode: 'lines', showlegend: false,
           line: { color: '#8b5cf6', width: 1.5, dash: 'dot' }
-        });
-      }
-
-      // Fuerza equivalente
-      if (F0 > 0) {
-        const Fscaled = F.map(f => f / k);
-        traces.push({
-          x: subT, y: Fscaled.slice(0, sliceIdx + 1), mode: 'lines', name: 'F(t)/k',
-          line: { color: '#10b981', width: 1.5, dash: 'dash' }
         });
       }
 
@@ -1232,6 +1124,8 @@
       };
 
       Plotly.react('plot-1dof-time', traces, layout, defaultPlotlyConfig);
+      attachZoomListener('plot-1dof-time');
+    }
       attachZoomListener('plot-1dof-time');
     }
 
@@ -1275,7 +1169,7 @@
 
         document.getElementById('anim-1dof-clock').textContent = `⏱️ t = ${currT.toFixed(2)} s / ${totalT.toFixed(1)} s`;
 
-        plot1DOFTime(sig.t, sig.x, sig.v, sig.F, sig.k, sig.F0, sig.zeta, sig.wn, sig.wd, sig.x0, sig.v0, currIdx);
+        plot1DOFTime(sig.t, sig.x, sig.v, sig.zeta, sig.wn, sig.wd, sig.x0, sig.v0, currIdx);
         drawCanvas1DOF(sig.x[currIdx], Math.max(0.1, Math.max(...sig.x.map(Math.abs))));
 
         if (animState1DOF.currentFrame < sig.t.length - 1) {
@@ -1306,7 +1200,7 @@
       if (!sig.t || sig.t.length === 0) return;
       animState1DOF.currentFrame = sig.t.length - 1;
       document.getElementById('anim-1dof-clock').textContent = `⏱️ t = ${sig.t[sig.t.length - 1].toFixed(1)} s / ${sig.t[sig.t.length - 1].toFixed(1)} s`;
-      plot1DOFTime(sig.t, sig.x, sig.v, sig.F, sig.k, sig.F0, sig.zeta, sig.wn, sig.wd, sig.x0, sig.v0, sig.t.length - 1);
+      plot1DOFTime(sig.t, sig.x, sig.v, sig.zeta, sig.wn, sig.wd, sig.x0, sig.v0, sig.t.length - 1);
       drawCanvas1DOF(sig.x[sig.t.length - 1], Math.max(0.1, Math.max(...sig.x.map(Math.abs))));
     }
 
@@ -1406,43 +1300,8 @@
       attachZoomListener('plot-1dof-phase');
     }
 
-    function plot1DOFBode(zeta, currR, currM, currPhi) {
-      const rArr = [];
-      const mArr = [];
-      for (let r = 0.05; r <= 3.0; r += 0.02) {
-        rArr.push(r);
-        const denom = Math.sqrt(Math.pow(1 - r*r, 2) + Math.pow(2 * zeta * r, 2));
-        mArr.push(1 / denom);
-      }
-
-      const traceM = {
-        x: rArr, y: mArr, mode: 'lines', name: 'Factor M(r)',
-        line: { color: '#10b981', width: 2.5 }
-      };
-
-      const tracePoint = {
-        x: [currR], y: [currM], mode: 'markers+text', name: 'Punto Actual',
-        text: [`r=${currR.toFixed(2)}, M=${currM.toFixed(2)}`], textposition: 'top right',
-        marker: { color: '#ef4444', size: 10, symbol: 'diamond' }
-      };
-
-      const layout = {
-        title: { text: 'Curva de Resonancia: Factor de Amplificación Dinámica M = X / (F0/k)', font: { size: 14 } },
-        xaxis: { title: 'Razón de Frecuencias r = ω / ωn', zeroline: true },
-        yaxis: { title: 'M(r) [adimensional]', zeroline: true },
-        shapes: [{
-          type: 'line', x0: 1, x1: 1, y0: 0, y1: Math.max(...mArr),
-          line: { color: 'gray', dash: 'dash', width: 1.5 }
-        }],
-        margin: { l: 45, r: 20, t: 40, b: 40 }
-      };
-
-      Plotly.react('plot-1dof-bode', [traceM, tracePoint], layout, defaultPlotlyConfig);
-      attachZoomListener('plot-1dof-bode');
-    }
-
     // ==============================================================
-    // LÓGICA FÍSICA: 2 GRADOS DE LIBERTAD (2 GDL)
+    // LÓGICA FÍSICA: 2 GRADOS DE LIBERTAD (2 GDL) - VIBRACIÓN LIBRE
     // ==============================================================
     function applyPreset2DOF() {
       const p = document.getElementById('preset-2dof').value;
@@ -1452,32 +1311,22 @@
         setVal('param-2dof-m1', 2.0); setVal('param-2dof-m2', 2.0);
         setVal('param-2dof-k1', 50.0); setVal('param-2dof-k2', 5.0); setVal('param-2dof-k3', 50.0);
         setVal('param-2dof-c1', 0.0); setVal('param-2dof-c2', 0.0); setVal('param-2dof-c3', 0.0);
-        setVal('param-2dof-F01', 0.0); setVal('param-2dof-w', 0.0);
         setVal('param-2dof-x1-0', 0.20); setVal('param-2dof-x2-0', 0.0);
       } else if (p === 'modo1') {
         setVal('param-2dof-m1', 2.0); setVal('param-2dof-m2', 2.0);
         setVal('param-2dof-k1', 40.0); setVal('param-2dof-k2', 20.0); setVal('param-2dof-k3', 40.0);
         setVal('param-2dof-c1', 0.0); setVal('param-2dof-c2', 0.0); setVal('param-2dof-c3', 0.0);
-        setVal('param-2dof-F01', 0.0); setVal('param-2dof-w', 0.0);
         setVal('param-2dof-x1-0', 0.15); setVal('param-2dof-x2-0', 0.15);
       } else if (p === 'modo2') {
         setVal('param-2dof-m1', 2.0); setVal('param-2dof-m2', 2.0);
         setVal('param-2dof-k1', 40.0); setVal('param-2dof-k2', 20.0); setVal('param-2dof-k3', 40.0);
         setVal('param-2dof-c1', 0.0); setVal('param-2dof-c2', 0.0); setVal('param-2dof-c3', 0.0);
-        setVal('param-2dof-F01', 0.0); setVal('param-2dof-w', 0.0);
         setVal('param-2dof-x1-0', 0.15); setVal('param-2dof-x2-0', -0.15);
-      } else if (p === 'resonancia1') {
+      } else if (p === 'amortiguado') {
         setVal('param-2dof-m1', 2.0); setVal('param-2dof-m2', 2.0);
-        setVal('param-2dof-k1', 40.0); setVal('param-2dof-k2', 20.0); setVal('param-2dof-k3', 40.0);
-        setVal('param-2dof-c1', 0.4); setVal('param-2dof-c2', 0.2); setVal('param-2dof-c3', 0.4);
-        setVal('param-2dof-F01', 5.0); setVal('param-2dof-w', 4.47);
-        setVal('param-2dof-x1-0', 0.0); setVal('param-2dof-x2-0', 0.0);
-      } else if (p === 'resonancia2') {
-        setVal('param-2dof-m1', 2.0); setVal('param-2dof-m2', 2.0);
-        setVal('param-2dof-k1', 40.0); setVal('param-2dof-k2', 20.0); setVal('param-2dof-k3', 40.0);
-        setVal('param-2dof-c1', 0.4); setVal('param-2dof-c2', 0.2); setVal('param-2dof-c3', 0.4);
-        setVal('param-2dof-F01', 5.0); setVal('param-2dof-w', 6.32);
-        setVal('param-2dof-x1-0', 0.0); setVal('param-2dof-x2-0', 0.0);
+        setVal('param-2dof-k1', 50.0); setVal('param-2dof-k2', 8.0); setVal('param-2dof-k3', 50.0);
+        setVal('param-2dof-c1', 0.6); setVal('param-2dof-c2', 0.3); setVal('param-2dof-c3', 0.6);
+        setVal('param-2dof-x1-0', 0.20); setVal('param-2dof-x2-0', 0.0);
       }
       update2DOF();
     }
@@ -1499,8 +1348,6 @@
       const c2 = parseFloat(document.getElementById('param-2dof-c2').value);
       const c3 = isFixedFixed ? parseFloat(document.getElementById('param-2dof-c3').value) : 0.0;
 
-      const F01 = parseFloat(document.getElementById('param-2dof-F01').value);
-      const omega = parseFloat(document.getElementById('param-2dof-w').value);
       const x1_0 = parseFloat(document.getElementById('param-2dof-x1-0').value);
       const x2_0 = parseFloat(document.getElementById('param-2dof-x2-0').value);
 
@@ -1539,7 +1386,7 @@
       document.getElementById('metric-2dof-ratio1').textContent = `Modo 1: x2/x1 = ${ratio1 >= 0 ? '+' : ''}${ratio1.toFixed(2)} (En fase)`;
       document.getElementById('metric-2dof-ratio2').textContent = `Modo 2: x2/x1 = ${ratio2 >= 0 ? '+' : ''}${ratio2.toFixed(2)} (Contrafase)`;
 
-      // Simulación RK4
+      // Simulación RK4 para vibración libre de 2 GDL: M x'' + C x' + K x = 0
       const tMax = 25.0;
       const N = 2500;
       const dt = tMax / N;
@@ -1560,11 +1407,21 @@
         v2[i] = curr_v2;
 
         const f_eval2 = (tm, q1, q2, u1, u2) => {
-          const ft1 = F01 * Math.cos(omega * tm);
-          const a1 = (ft1 - C11 * u1 - C12 * u2 - K11 * q1 - K12 * q2) / m1;
+          const a1 = (- C11 * u1 - C12 * u2 - K11 * q1 - K12 * q2) / m1;
           const a2 = (- C21 * u1 - C22 * u2 - K21 * q1 - K22 * q2) / m2;
           return [u1, u2, a1, a2];
         };
+
+        const k1 = f_eval2(time, curr_x1, curr_x2, curr_v1, curr_v2);
+        const k2 = f_eval2(time + 0.5*dt, curr_x1 + 0.5*dt*k1[0], curr_x2 + 0.5*dt*k1[1], curr_v1 + 0.5*dt*k1[2], curr_v2 + 0.5*dt*k1[3]);
+        const k3 = f_eval2(time + 0.5*dt, curr_x1 + 0.5*dt*k2[0], curr_x2 + 0.5*dt*k2[1], curr_v1 + 0.5*dt*k2[2], curr_v2 + 0.5*dt*k2[3]);
+        const k4 = f_eval2(time + dt, curr_x1 + dt*k3[0], curr_x2 + dt*k3[1], curr_v1 + dt*k3[2], curr_v2 + dt*k3[3]);
+
+        curr_x1 += (dt / 6) * (k1[0] + 2*k2[0] + 2*k3[0] + k4[0]);
+        curr_x2 += (dt / 6) * (k1[1] + 2*k2[1] + 2*k3[1] + k4[1]);
+        curr_v1 += (dt / 6) * (k1[2] + 2*k2[2] + 2*k3[2] + k4[2]);
+        curr_v2 += (dt / 6) * (k1[3] + 2*k2[3] + 2*k3[3] + k4[3]);
+      }
 
         const k1 = f_eval2(time, curr_x1, curr_x2, curr_v1, curr_v2);
         const k2 = f_eval2(time + 0.5*dt, curr_x1 + 0.5*dt*k1[0], curr_x2 + 0.5*dt*k1[1], curr_v1 + 0.5*dt*k1[2], curr_v2 + 0.5*dt*k1[3]);

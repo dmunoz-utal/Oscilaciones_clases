@@ -96,22 +96,16 @@ app_mode = st.sidebar.radio(
     index=0
 )
 
-st.sidebar.divider()
-st.sidebar.markdown("""
-**Repositorio GitHub:**
-[Oscilaciones_clases](https://github.com/dmunoz-utal/Oscilaciones_clases.git)
-""")
-
 # -------------------------------------------------------------
-# MÓDULO 1: 1 GRADO DE LIBERTAD
+# MÓDULO 1: 1 GRADO DE LIBERTAD (VIBRACIÓN LIBRE Y AMORTIGUADA)
 # -------------------------------------------------------------
 if app_mode == "🔵 1 Grado de Libertad (1 GDL)":
     st.markdown("""
     <div class="section-banner">
         <h2 style='margin:0; padding:0; color:white;'>⚙️ Sistema de 1 Grado de Libertad (1 GDL)</h2>
         <p style='margin:4px 0 0 0; color:#e0e0e0; font-size:0.95rem;'>
-            Ecuación diferencial: <i>m x''(t) + c x'(t) + k x(t) = F₀ cos(ω t)</i>.
-            Estudia vibraciones libres, amortiguadas, resonancia y desfasaje.
+            Ecuación diferencial: <i>m x''(t) + c x'(t) + k x(t) = 0</i>.
+            Estudia vibraciones libres no amortiguadas y amortiguadas con condiciones iniciales.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -128,50 +122,32 @@ if app_mode == "🔵 1 Grado de Libertad (1 GDL)":
                 "1. Libre No Amortiguada (c = 0)",
                 "2. Libre Subamortiguada (0 < ζ < 1)",
                 "3. Libre Críticamente Amortiguada (ζ = 1)",
-                "4. Libre Sobreamortiguada (ζ > 1)",
-                "5. Resonancia Armónica Pura (ω = ωn, c = 0)",
-                "6. Resonancia Amortiguada (ω ≈ ωn, c > 0)",
-                "7. Aislamiento de Vibraciones (ω >> ωn)"
+                "4. Libre Sobreamortiguada (ζ > 1)"
             ],
             index=2
         )
 
         # Valores por defecto según preajuste
         if preset_1dof == "1. Libre No Amortiguada (c = 0)":
-            def_m, def_k, def_c, def_F0, def_w, def_x0, def_v0 = 2.0, 50.0, 0.0, 0.0, 0.0, 0.15, 0.0
+            def_m, def_k, def_c, def_x0, def_v0 = 2.0, 50.0, 0.0, 0.15, 0.0
         elif preset_1dof == "2. Libre Subamortiguada (0 < ζ < 1)":
-            def_m, def_k, def_c, def_F0, def_w, def_x0, def_v0 = 2.0, 50.0, 2.0, 0.0, 0.0, 0.20, 0.0
+            def_m, def_k, def_c, def_x0, def_v0 = 2.0, 50.0, 2.0, 0.20, 0.0
         elif preset_1dof == "3. Libre Críticamente Amortiguada (ζ = 1)":
-            # c_c = 2*sqrt(k*m) = 2*sqrt(50*2) = 20
-            def_m, def_k, def_c, def_F0, def_w, def_x0, def_v0 = 2.0, 50.0, 20.0, 0.0, 0.0, 0.20, 0.0
+            def_m, def_k, def_c, def_x0, def_v0 = 2.0, 50.0, 20.0, 0.20, 0.0
         elif preset_1dof == "4. Libre Sobreamortiguada (ζ > 1)":
-            def_m, def_k, def_c, def_F0, def_w, def_x0, def_v0 = 2.0, 50.0, 35.0, 0.0, 0.0, 0.20, 0.5
-        elif preset_1dof == "5. Resonancia Armónica Pura (ω = ωn, c = 0)":
-            # wn = sqrt(50/2) = 5 rad/s
-            def_m, def_k, def_c, def_F0, def_w, def_x0, def_v0 = 2.0, 50.0, 0.0, 5.0, 5.0, 0.0, 0.0
-        elif preset_1dof == "6. Resonancia Amortiguada (ω ≈ ωn, c > 0)":
-            def_m, def_k, def_c, def_F0, def_w, def_x0, def_v0 = 2.0, 50.0, 2.5, 8.0, 5.0, 0.0, 0.0
-        elif preset_1dof == "7. Aislamiento de Vibraciones (ω >> ωn)":
-            def_m, def_k, def_c, def_F0, def_w, def_x0, def_v0 = 2.0, 50.0, 3.0, 15.0, 14.0, 0.0, 0.0
+            def_m, def_k, def_c, def_x0, def_v0 = 2.0, 50.0, 35.0, 0.20, 0.5
         else:
-            def_m, def_k, def_c, def_F0, def_w, def_x0, def_v0 = 2.0, 50.0, 1.5, 5.0, 4.0, 0.10, 0.0
+            def_m, def_k, def_c, def_x0, def_v0 = 2.0, 50.0, 1.5, 0.15, 0.0
+
+        F0 = 0.0
+        omega = 0.0
 
         with st.expander("📦 Parámetros Estructurales (m, k, c)", expanded=True):
             m = st.number_input("Masa m [kg]:", min_value=0.05, max_value=500.0, value=def_m, step=0.5)
             k = st.number_input("Rigidez del resorte k [N/m]:", min_value=0.1, max_value=5000.0, value=def_k, step=5.0)
             c = st.number_input("Coeficiente de amortiguamiento c [N·s/m]:", min_value=0.0, max_value=200.0, value=def_c, step=0.5)
 
-        with st.expander("⚡ Excitación (Fuerza Aplicada)", expanded=True):
-            force_type = st.radio("Tipo de régimen:", ["Vibración Libre (F₀ = 0)", "Vibración Forzada Armónica F(t)"],
-                                  index=0 if def_F0 == 0.0 else 1)
-            if force_type == "Vibración Forzada Armónica F(t)":
-                F0 = st.number_input("Amplitud de la fuerza F₀ [N]:", min_value=0.0, max_value=500.0, value=max(def_F0, 1.0), step=1.0)
-                omega = st.number_input("Frecuencia de excitación ω [rad/s]:", min_value=0.05, max_value=50.0, value=max(def_w, 1.0), step=0.2)
-            else:
-                F0 = 0.0
-                omega = 0.0
-
-        with st.expander("🎯 Condiciones Iniciales y Tiempo", expanded=False):
+        with st.expander("🎯 Condiciones Iniciales y Tiempo", expanded=True):
             x0 = st.number_input("Posición inicial x₀ [m]:", min_value=-5.0, max_value=5.0, value=def_x0, step=0.02)
             v0 = st.number_input("Velocidad inicial v₀ [m/s]:", min_value=-20.0, max_value=20.0, value=def_v0, step=0.1)
             t_max = st.slider("Tiempo total de simulación [s]:", min_value=2.0, max_value=60.0, value=20.0, step=1.0)
@@ -214,31 +190,28 @@ if app_mode == "🔵 1 Grado de Libertad (1 GDL)":
             </div>
             """, unsafe_allow_html=True)
         with kpi4:
-            amp_display = f"{forced_params['X_steady']:.3f} m" if (F0 > 0 and not np.isinf(forced_params['X_steady'])) else f"{sim_res['X_max_observed']:.3f} m"
             st.markdown(f"""
             <div class="metric-card">
-                <div class="metric-title">Amplitud Máx / Estac.</div>
-                <div class="metric-value">{amp_display}</div>
-                <div class="metric-sub">{'M = ' + f"{forced_params['M']:.2f}" if F0 > 0 else 'Obs. en tiempo'}</div>
+                <div class="metric-title">Amplitud Máx. Obs.</div>
+                <div class="metric-value">{sim_res['X_max_observed']:.3f} m</div>
+                <div class="metric-sub">Pico máx |x(t)|</div>
             </div>
             """, unsafe_allow_html=True)
         with kpi5:
-            phase_display = f"{forced_params['phi_deg']:.1f}°" if F0 > 0 else "0.0°"
             st.markdown(f"""
             <div class="metric-card">
-                <div class="metric-title">Ángulo de Desfase</div>
-                <div class="metric-value">{phase_display}</div>
-                <div class="metric-sub">{'r = ' + f"{forced_params['r']:.2f}" if F0 > 0 else 'Vibración libre'}</div>
+                <div class="metric-title">Condición Inicial</div>
+                <div class="metric-value">x₀={x0:.2f} m</div>
+                <div class="metric-sub">v₀ = {v0:.2f} m/s</div>
             </div>
             """, unsafe_allow_html=True)
 
         st.info(f"**Régimen actual:** {sys_1dof.regime_label}")
 
         # Pestañas de gráficos
-        tab_time, tab_phase, tab_bode, tab_table = st.tabs([
+        tab_time, tab_phase, tab_table = st.tabs([
             "📈 Gráfico de Oscilación x(t)",
             "🌀 Diagrama de Fase (x vs v)",
-            "🎯 Curva de Resonancia y Fase",
             "📋 Parámetros y Exportación"
         ])
 
@@ -249,10 +222,6 @@ if app_mode == "🔵 1 Grado de Libertad (1 GDL)":
         with tab_phase:
             fig_phase = plot_phase_portrait(sim_res["x"], sim_res["v"], title="Plano de Fase: Velocidad vs Desplazamiento")
             st.plotly_chart(fig_phase, use_container_width=True, config=PLOTLY_CONFIG)
-
-        with tab_bode:
-            fig_bode = plot_resonance_curve(sys_1dof)
-            st.plotly_chart(fig_bode, use_container_width=True, config=PLOTLY_CONFIG)
 
         with tab_table:
             st.markdown("#### Resumen Analítico de Variables del Sistema")
@@ -266,11 +235,8 @@ if app_mode == "🔵 1 Grado de Libertad (1 GDL)":
                 {"Parámetro": "Razón de amortiguamiento (ζ)", "Valor": f"{sys_1dof.zeta:.4f}", "Unidad": "adimensional", "Descripción": "c / cc"},
                 {"Parámetro": "Frecuencia amortiguada (ωd)", "Valor": f"{sys_1dof.omega_d:.3f}", "Unidad": "rad/s", "Descripción": "ωn * sqrt(1 - ζ²)"},
                 {"Parámetro": "Decremento logarítmico (δ)", "Valor": f"{sys_1dof.log_decrement:.3f}", "Unidad": "adimensional", "Descripción": "2πζ / sqrt(1 - ζ²)"},
-                {"Parámetro": "Amplitud fuerza (F₀)", "Valor": f"{F0:.3f}", "Unidad": "N", "Descripción": "Magnitud excitación"},
-                {"Parámetro": "Frecuencia excitación (ω)", "Valor": f"{omega:.3f}", "Unidad": "rad/s", "Descripción": "Pulsación fuerza armónica"},
-                {"Parámetro": "Razón de frecuencias (r)", "Valor": f"{forced_params['r']:.3f}", "Unidad": "adimensional", "Descripción": "ω / ωn"},
-                {"Parámetro": "Factor amplificación dinámica (M)", "Valor": f"{forced_params['M']:.3f}", "Unidad": "adimensional", "Descripción": "X / (F0/k)"},
-                {"Parámetro": "Desfasaje (φ)", "Valor": f"{forced_params['phi_deg']:.2f}", "Unidad": "grados", "Descripción": "Retardo respecto a la fuerza"},
+                {"Parámetro": "Posición inicial (x₀)", "Valor": f"{x0:.3f}", "Unidad": "m", "Descripción": "Condición inicial x(0)"},
+                {"Parámetro": "Velocidad inicial (v₀)", "Valor": f"{v0:.3f}", "Unidad": "m/s", "Descripción": "Condición inicial v(0)"},
             ])
             st.dataframe(df_params, use_container_width=True)
 
@@ -278,8 +244,7 @@ if app_mode == "🔵 1 Grado de Libertad (1 GDL)":
             df_export = pd.DataFrame({
                 "tiempo_s": sim_res["t"],
                 "posicion_m": sim_res["x"],
-                "velocidad_m_s": sim_res["v"],
-                "fuerza_N": sim_res["F"]
+                "velocidad_m_s": sim_res["v"]
             })
             csv_data = df_export.to_csv(index=False).encode('utf-8')
             st.download_button(
@@ -325,9 +290,7 @@ elif app_mode == "🟣 2 Grados de Libertad (2 GDL)":
                 "1. Modo 1 Puro (Movimiento en fase)",
                 "2. Modo 2 Puro (Movimiento en contrafase)",
                 "3. Batimiento / Transferencia de Energía (m1=m2, k2 débil)",
-                "4. Resonancia en Modo 1 (ω = ωn1)",
-                "5. Resonancia en Modo 2 (ω = ωn2)",
-                "6. Amortiguado acoplado (c1, c2 > 0)"
+                "4. Libre Amortiguado acoplado (c > 0)"
             ],
             index=3
         )
@@ -336,42 +299,25 @@ elif app_mode == "🟣 2 Grados de Libertad (2 GDL)":
         if preset_2dof == "1. Modo 1 Puro (Movimiento en fase)":
             p_m1, p_m2, p_k1, p_k2, p_k3 = 2.0, 2.0, 40.0, 20.0, 40.0
             p_c1, p_c2, p_c3 = 0.0, 0.0, 0.0
-            p_F01, p_F02, p_w = 0.0, 0.0, 0.0
             # Modo 1 para simetría: x1 = 0.15, x2 = 0.15
             p_x1_0, p_x2_0, p_v1_0, p_v2_0 = 0.15, 0.15, 0.0, 0.0
         elif preset_2dof == "2. Modo 2 Puro (Movimiento en contrafase)":
             p_m1, p_m2, p_k1, p_k2, p_k3 = 2.0, 2.0, 40.0, 20.0, 40.0
             p_c1, p_c2, p_c3 = 0.0, 0.0, 0.0
-            p_F01, p_F02, p_w = 0.0, 0.0, 0.0
             # Modo 2 para simetría: x1 = 0.15, x2 = -0.15
             p_x1_0, p_x2_0, p_v1_0, p_v2_0 = 0.15, -0.15, 0.0, 0.0
         elif preset_2dof == "3. Batimiento / Transferencia de Energía (m1=m2, k2 débil)":
             p_m1, p_m2, p_k1, p_k2, p_k3 = 2.0, 2.0, 50.0, 5.0, 50.0
             p_c1, p_c2, p_c3 = 0.0, 0.0, 0.0
-            p_F01, p_F02, p_w = 0.0, 0.0, 0.0
             # Soltar m1 desplazada con m2 en reposo genera batimiento puro
             p_x1_0, p_x2_0, p_v1_0, p_v2_0 = 0.20, 0.0, 0.0, 0.0
-        elif preset_2dof == "4. Resonancia en Modo 1 (ω = ωn1)":
-            p_m1, p_m2, p_k1, p_k2, p_k3 = 2.0, 2.0, 40.0, 20.0, 40.0
-            p_c1, p_c2, p_c3 = 0.5, 0.5, 0.5
-            # wn1 = sqrt(40/2) = 4.47 rad/s
-            p_F01, p_F02, p_w = 5.0, 0.0, 4.47
-            p_x1_0, p_x2_0, p_v1_0, p_v2_0 = 0.0, 0.0, 0.0, 0.0
-        elif preset_2dof == "5. Resonancia en Modo 2 (ω = ωn2)":
-            p_m1, p_m2, p_k1, p_k2, p_k3 = 2.0, 2.0, 40.0, 20.0, 40.0
-            p_c1, p_c2, p_c3 = 0.5, 0.5, 0.5
-            # wn2 = sqrt((40+40)/2) = 6.32 rad/s
-            p_F01, p_F02, p_w = 5.0, 0.0, 6.32
-            p_x1_0, p_x2_0, p_v1_0, p_v2_0 = 0.0, 0.0, 0.0, 0.0
-        elif preset_2dof == "6. Amortiguado acoplado (c1, c2 > 0)":
+        elif preset_2dof == "4. Libre Amortiguado acoplado (c > 0)":
             p_m1, p_m2, p_k1, p_k2, p_k3 = 2.0, 2.0, 40.0, 15.0, 40.0
             p_c1, p_c2, p_c3 = 1.2, 0.8, 1.2
-            p_F01, p_F02, p_w = 0.0, 0.0, 0.0
             p_x1_0, p_x2_0, p_v1_0, p_v2_0 = 0.20, 0.0, 0.0, 0.0
         else:
             p_m1, p_m2, p_k1, p_k2, p_k3 = 2.0, 2.0, 40.0, 20.0, 40.0
             p_c1, p_c2, p_c3 = 0.2, 0.2, 0.2
-            p_F01, p_F02, p_w = 0.0, 0.0, 0.0
             p_x1_0, p_x2_0, p_v1_0, p_v2_0 = 0.15, 0.0, 0.0, 0.0
 
         with st.expander("📦 Masas (m₁, m₂)", expanded=True):
@@ -398,14 +344,7 @@ elif app_mode == "🟣 2 Grados de Libertad (2 GDL)":
             else:
                 c3 = 0.0
 
-        with st.expander("⚡ Fuerzas Aplicadas", expanded=False):
-            f_active = st.checkbox("Activar fuerza armónica externa", value=(p_F01 > 0 or p_F02 > 0))
-            if f_active:
-                F01 = st.number_input("Amplitud F₀₁ sobre m₁ [N]:", min_value=0.0, max_value=200.0, value=max(p_F01, 2.0), step=1.0)
-                F02 = st.number_input("Amplitud F₀₂ sobre m₂ [N]:", min_value=0.0, max_value=200.0, value=p_F02, step=1.0)
-                omega_2dof = st.number_input("Frecuencia ω [rad/s]:", min_value=0.1, max_value=30.0, value=max(p_w, 2.0), step=0.2)
-            else:
-                F01, F02, omega_2dof = 0.0, 0.0, 0.0
+        F01, F02, omega_2dof = 0.0, 0.0, 0.0
 
         with st.expander("🎯 Condiciones Iniciales", expanded=False):
             col_ci1, col_ci2 = st.columns(2)
@@ -427,7 +366,6 @@ elif app_mode == "🟣 2 Grados de Libertad (2 GDL)":
     )
     modal = sys_2dof.modal_analysis()
     sim_2dof = sys_2dof.simulate(t_max=t_max_2dof, num_points=3000)
-    forced_2dof = sys_2dof.forced_response_params()
 
     # Guardar en st.session_state para la pestaña de Fourier
     st.session_state["signal_2dof_t"] = sim_2dof["t"]
@@ -467,20 +405,19 @@ elif app_mode == "🟣 2 Grados de Libertad (2 GDL)":
             </div>
             """, unsafe_allow_html=True)
         with k4_c:
-            fase_info = f"Δφ = {forced_2dof['phase_diff_deg']:.1f}°" if (F01 > 0 or F02 > 0) else "Vibración Libre"
+            amort_label = "Amortiguado" if (c1 > 0 or c2 > 0 or c3 > 0) else "Sin Amortiguamiento"
             st.markdown(f"""
             <div class="metric-card">
-                <div class="metric-title">Desfase Estacionario</div>
-                <div class="metric-value">{fase_info}</div>
-                <div class="metric-sub">{'ω exc = ' + f'{omega_2dof:.2f} rad/s' if omega_2dof > 0 else 'Sin forzamiento'}</div>
+                <div class="metric-title">Régimen 2 GDL</div>
+                <div class="metric-value">{amort_label}</div>
+                <div class="metric-sub">c₁={c1:.1f}, c₂={c2:.1f}, c₃={c3:.1f}</div>
             </div>
             """, unsafe_allow_html=True)
 
-        tab_2dof_time, tab_2dof_modes, tab_2dof_orbit, tab_2dof_bode, tab_2dof_mat = st.tabs([
+        tab_2dof_time, tab_2dof_modes, tab_2dof_orbit, tab_2dof_mat = st.tabs([
             "📈 Respuesta en el Tiempo x₁(t) y x₂(t)",
             "📊 Formas Modales (Autovectores)",
             "🌀 Plano de Fase y Acoplamiento (x₁ vs x₂)",
-            "🎯 Barrido de Frecuencia y Resonancias",
             "📋 Matrices del Sistema [M], [K], [C]"
         ])
 
@@ -506,10 +443,6 @@ elif app_mode == "🟣 2 Grados de Libertad (2 GDL)":
             with col_orb2:
                 fig_pf1 = plot_phase_portrait(sim_2dof["x1"], sim_2dof["v1"], title="Plano de Fase Masa 1 (x₁ vs v₁)")
                 st.plotly_chart(fig_pf1, use_container_width=True, config=PLOTLY_CONFIG)
-
-        with tab_2dof_bode:
-            fig_sw = plot_2dof_resonance_curves(sys_2dof)
-            st.plotly_chart(fig_sw, use_container_width=True, config=PLOTLY_CONFIG)
 
         with tab_2dof_mat:
             st.markdown("#### Formulación Matricial del Sistema")
@@ -715,41 +648,57 @@ elif app_mode == "📖 Guía Teórica y Fórmulas":
     </div>
     """, unsafe_allow_html=True)
 
-    with st.expander("1. Sistema de 1 Grado de Libertad (1 GDL)", expanded=True):
+    with st.expander("1. Sistema de 1 Grado de Libertad (1 GDL) - Vibración Libre y Amortiguada", expanded=True):
         st.markdown(r"""
-        La ecuación diferencial fundamental según la 2ª Ley de Newton es:
-        $$m \ddot{x}(t) + c \dot{x}(t) + k x(t) = F_0 \cos(\omega t)$$
+        La ecuación diferencial fundamental para vibración libre y amortiguada según la 2ª Ley de Newton es:
+        $$m \ddot{x}(t) + c \dot{x}(t) + k x(t) = 0$$
 
         Dividiendo por la masa $m$:
-        $$\ddot{x}(t) + 2 \zeta \omega_n \dot{x}(t) + \omega_n^2 x(t) = \frac{F_0}{m} \cos(\omega t)$$
+        $$\ddot{x}(t) + 2 \zeta \omega_n \dot{x}(t) + \omega_n^2 x(t) = 0$$
 
         **Parámetros fundamentales:**
         - **Frecuencia natural no amortiguada:** $\omega_n = \sqrt{\frac{k}{m}}$ [rad/s], $f_n = \frac{\omega_n}{2\pi}$ [Hz].
-        - **Amortiguamiento crítico:** $c_c = 2\sqrt{km} = 2 m \omega_n$.
+        - **Amortiguamiento crítico:** $c_c = 2\sqrt{km} = 2 m \omega_n$ [N·s/m].
         - **Razón de amortiguamiento:** $\zeta = \frac{c}{c_c} = \frac{c}{2\sqrt{km}}$.
-        - **Frecuencia natural amortiguada (cuando $\zeta < 1$):** $\omega_d = \omega_n \sqrt{1 - \zeta^2}$.
-        - **Factor de amplificación dinámica:**
-          $$M(r) = \frac{X}{F_0/k} = \frac{1}{\sqrt{(1 - r^2)^2 + (2\zeta r)^2}}, \quad \text{donde } r = \frac{\omega}{\omega_n}$$
-        - **Ángulo de desfasaje entre fuerza y desplazamiento:**
-          $$\phi = \arctan\left( \frac{2\zeta r}{1 - r^2} \right)$$
+
+        **Regímenes de movimiento libre:**
+        - **No amortiguado ($\zeta = 0$):**
+          $$x(t) = x_0 \cos(\omega_n t) + \frac{v_0}{\omega_n} \sin(\omega_n t) = A \cos(\omega_n t - \phi)$$
+          Oscilación armónica periódica perpetua de amplitud constante $A = \sqrt{x_0^2 + (v_0/\omega_n)^2}$.
+        - **Subamortiguado ($0 < \zeta < 1$):**
+          $$x(t) = e^{-\zeta \omega_n t} \left[ x_0 \cos(\omega_d t) + \frac{v_0 + \zeta \omega_n x_0}{\omega_d} \sin(\omega_d t) \right]$$
+          Donde $\omega_d = \omega_n \sqrt{1 - \zeta^2}$ es la frecuencia natural amortiguada. La amplitud decae según la envolvente exponencial $\pm X_0 e^{-\zeta \omega_n t}$.
+        - **Críticamente amortiguado ($\zeta = 1$):**
+          $$x(t) = \left[ x_0 + (v_0 + \omega_n x_0)t \right] e^{-\omega_n t}$$
+          El sistema retorna a la posición de equilibrio en el menor tiempo posible sin oscilar.
+        - **Sobreamortiguado ($\zeta > 1$):**
+          $$x(t) = C_1 e^{r_1 t} + C_2 e^{r_2 t}, \quad r_{1,2} = -\zeta \omega_n \pm \omega_n \sqrt{\zeta^2 - 1}$$
+          Retorno aperiódico lento hacia el equilibrio sin oscilación.
         """)
 
-    with st.expander("2. Sistema de 2 Grados de Libertad (2 GDL)", expanded=True):
+    with st.expander("2. Sistema de 2 Grados de Libertad (2 GDL) - Modos y Batimiento", expanded=True):
         st.markdown(r"""
-        La formulación matricial para dos masas acopladas es:
-        $$\mathbf{M}\ddot{\mathbf{x}} + \mathbf{C}\dot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{F}(t)$$
+        La formulación matricial para vibración libre de dos masas acopladas es:
+        $$\mathbf{M}\ddot{\mathbf{x}} + \mathbf{C}\dot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}$$
 
-        Donde para el caso clásico entre dos paredes fijas:
+        Donde para el caso clásico entre paredes:
         $$\mathbf{M} = \begin{bmatrix} m_1 & 0 \\ 0 & m_2 \end{bmatrix}, \quad
           \mathbf{K} = \begin{bmatrix} k_1 + k_2 & -k_2 \\ -k_2 & k_2 + k_3 \end{bmatrix}, \quad
           \mathbf{C} = \begin{bmatrix} c_1 + c_2 & -c_2 \\ -c_2 & c_2 + c_3 \end{bmatrix}$$
 
         **Problema de Autovalores y Modos Normales:**
-        Para vibración libre no amortiguada ($\mathbf{C} = \mathbf{0}, \mathbf{F} = \mathbf{0}$), asumiendo $\mathbf{x}(t) = \boldsymbol{\phi} e^{i\omega t}$:
+        Para vibración libre no amortiguada ($\mathbf{C} = \mathbf{0}$), proponiendo $\mathbf{x}(t) = \boldsymbol{\phi} e^{i\omega t}$:
         $$\det(\mathbf{K} - \omega^2 \mathbf{M}) = 0$$
 
-        Esto genera una ecuación bicuadrática cuyas dos raíces reales positivas $\omega_{n1}$ y $\omega_{n2}$ son las frecuencias naturales del sistema acoplado.
-        Para cada frecuencia natural se obtiene un modo característico de vibración (autovector $\boldsymbol{\phi}_1, \boldsymbol{\phi}_2$).
+        Esto determina las frecuencias naturales $\omega_{n1}$ y $\omega_{n2}$ del sistema acoplado y sus respectivos modos característicos $\boldsymbol{\phi}_1, \boldsymbol{\phi}_2$.
+        La respuesta general es la superposición modal:
+        $$\mathbf{x}(t) = q_1(t)\boldsymbol{\phi}_1 + q_2(t)\boldsymbol{\phi}_2$$
+
+        **Fenómeno de Batimiento (Beating):**
+        Cuando las dos frecuencias naturales son cercanas ($\omega_{n1} \approx \omega_{n2}$) y se perturba inicialmente una sola masa ($x_1(0) > 0, x_2(0) = 0$), la energía mecánica se transfiere periódicamente entre ambas masas con una frecuencia de envolvente $\omega_b = |\omega_{n2} - \omega_{n1}| / 2$.
+
+        **Efecto del Amortiguamiento ($\mathbf{C} > \mathbf{0}$):**
+        En presencia de amortiguadores, la energía de ambos modos decae gradualmente con el tiempo hasta alcanzar el reposo estático.
         """)
 
     with st.expander("3. Transformada de Fourier y Reconstrucción Espectral", expanded=True):
