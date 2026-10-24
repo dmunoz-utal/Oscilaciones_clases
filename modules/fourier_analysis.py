@@ -71,9 +71,32 @@ def reconstruct_fourier_top_n(t: np.ndarray, x: np.ndarray, num_components: int 
 
     num_components = min(max(1, num_components), len(ac_indices))
 
-    # Ordenar índices AC de mayor a menor amplitud
-    sorted_order = np.argsort(ac_amps)[::-1]
-    top_ac_indices = ac_indices[sorted_order[:num_components]]
+    # Selección inteligente de picos espectrales:
+    # 1. Detectar crestas locales para evitar hombros de fuga espectral
+    max_ac = float(np.max(ac_amps)) if len(ac_amps) > 0 else 1.0
+    local_peaks = []
+    for k in range(1, len(amplitude) - 1):
+        if amplitude[k] >= amplitude[k - 1] and amplitude[k] >= amplitude[k + 1] and amplitude[k] > 0.002 * max_ac:
+            local_peaks.append(k)
+    local_peaks = sorted(local_peaks, key=lambda idx: amplitude[idx], reverse=True)
+
+    # 2. Tomar picos locales primero; si se solicitan más componentes, completar con los bins restantes
+    selected_indices = []
+    selected_set = set()
+    for p in local_peaks:
+        if len(selected_indices) < num_components:
+            selected_indices.append(p)
+            selected_set.add(p)
+
+    if len(selected_indices) < num_components:
+        remaining = [i for i in ac_indices if i not in selected_set]
+        remaining = sorted(remaining, key=lambda idx: amplitude[idx], reverse=True)
+        for b in remaining:
+            if len(selected_indices) < num_components:
+                selected_indices.append(b)
+                selected_set.add(b)
+
+    top_ac_indices = np.array(selected_indices, dtype=int)
 
     # Reconstrucción analítica armónica:
     # x_rec(t) = DC + sum_k A_k * cos(w_k * t + phi_k)

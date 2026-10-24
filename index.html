@@ -1722,11 +1722,42 @@
 
       const dcVal = amp[0];
 
-      const acIndices = [];
-      for (let i = 1; i < numFreqs; i++) acIndices.push(i);
-      acIndices.sort((a, b) => amp[b] - amp[a]);
+      // Selección inteligente de picos espectrales:
+      // 1. Detectar máximos locales (crestas del espectro) para no elegir hombros de fuga espectral
+      const localPeaks = [];
+      const maxAcAmp = Math.max(...amp.slice(1));
+      for (let k = 1; k < numFreqs - 1; k++) {
+        if (amp[k] >= amp[k - 1] && amp[k] >= amp[k + 1] && amp[k] > 0.002 * maxAcAmp) {
+          localPeaks.push(k);
+        }
+      }
+      localPeaks.sort((a, b) => amp[b] - amp[a]);
 
-      const selectedIndices = acIndices.slice(0, numComp);
+      // 2. Seleccionar los picos locales primero; si se piden más componentes que picos,
+      // completar con los bins de mayor amplitud restantes
+      const selectedIndices = [];
+      const selectedSet = new Set();
+
+      for (const p of localPeaks) {
+        if (selectedIndices.length < numComp) {
+          selectedIndices.push(p);
+          selectedSet.add(p);
+        }
+      }
+
+      if (selectedIndices.length < numComp) {
+        const remainingBins = [];
+        for (let i = 1; i < numFreqs; i++) {
+          if (!selectedSet.has(i)) remainingBins.push(i);
+        }
+        remainingBins.sort((a, b) => amp[b] - amp[a]);
+        for (const b of remainingBins) {
+          if (selectedIndices.length < numComp) {
+            selectedIndices.push(b);
+            selectedSet.add(b);
+          }
+        }
+      }
 
       const xRec = new Array(N).fill(dcVal);
       const componentsInfo = [];
@@ -1740,16 +1771,19 @@
         selectedEnergy += A_k * A_k;
 
         for (let n = 0; n < N; n++) {
-          xRec[n] += A_k * Math.cos(w_k * (t[n] - t[0]) - phi_k);
+          xRec[n] += A_k * Math.cos(w_k * (t[n] - t[0]) + phi_k);
         }
+
+        let deg = (phi_k * 180 / Math.PI) % 360;
+        if (deg < 0) deg += 360;
 
         componentsInfo.push({
           rank: rank + 1,
           freqRad: w_k,
           freqHz: f_k,
           amplitude: A_k,
-          phaseDeg: (-phi_k * 180 / Math.PI) % 360,
-          phaseRad: -phi_k
+          phaseDeg: deg,
+          phaseRad: phi_k
         });
       });
 
