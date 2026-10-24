@@ -2,6 +2,8 @@
 
 Herramienta interactiva y pedagógica desarrollada para la enseñanza de vibraciones mecánicas y oscilaciones para estudiantes de ingeniería y física. Enfocada en **vibración libre** (no amortiguada y amortiguada) para 1 y 2 grados de libertad, animación física en tiempo real y análisis de Fourier.
 
+Repositorio: [https://github.com/dmunoz-utal/Oscilaciones_clases](https://github.com/dmunoz-utal/Oscilaciones_clases)
+
 ---
 
 ## 🌟 Características Principales

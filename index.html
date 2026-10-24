@@ -1126,8 +1126,6 @@
       Plotly.react('plot-1dof-time', traces, layout, defaultPlotlyConfig);
       attachZoomListener('plot-1dof-time');
     }
-      attachZoomListener('plot-1dof-time');
-    }
 
     // ANIMACIÓN EN TIEMPO REAL 1 GDL
     function togglePlay1DOF() {
@@ -1411,17 +1409,6 @@
           const a2 = (- C21 * u1 - C22 * u2 - K21 * q1 - K22 * q2) / m2;
           return [u1, u2, a1, a2];
         };
-
-        const k1 = f_eval2(time, curr_x1, curr_x2, curr_v1, curr_v2);
-        const k2 = f_eval2(time + 0.5*dt, curr_x1 + 0.5*dt*k1[0], curr_x2 + 0.5*dt*k1[1], curr_v1 + 0.5*dt*k1[2], curr_v2 + 0.5*dt*k1[3]);
-        const k3 = f_eval2(time + 0.5*dt, curr_x1 + 0.5*dt*k2[0], curr_x2 + 0.5*dt*k2[1], curr_v1 + 0.5*dt*k2[2], curr_v2 + 0.5*dt*k2[3]);
-        const k4 = f_eval2(time + dt, curr_x1 + dt*k3[0], curr_x2 + dt*k3[1], curr_v1 + dt*k3[2], curr_v2 + dt*k3[3]);
-
-        curr_x1 += (dt / 6) * (k1[0] + 2*k2[0] + 2*k3[0] + k4[0]);
-        curr_x2 += (dt / 6) * (k1[1] + 2*k2[1] + 2*k3[1] + k4[1]);
-        curr_v1 += (dt / 6) * (k1[2] + 2*k2[2] + 2*k3[2] + k4[2]);
-        curr_v2 += (dt / 6) * (k1[3] + 2*k2[3] + 2*k3[3] + k4[3]);
-      }
 
         const k1 = f_eval2(time, curr_x1, curr_x2, curr_v1, curr_v2);
         const k2 = f_eval2(time + 0.5*dt, curr_x1 + 0.5*dt*k1[0], curr_x2 + 0.5*dt*k1[1], curr_v1 + 0.5*dt*k1[2], curr_v2 + 0.5*dt*k1[3]);
