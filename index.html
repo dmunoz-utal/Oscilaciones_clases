@@ -237,25 +237,44 @@
 
           <!-- Sub-pestañas de gráficos 1 GDL -->
           <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="flex border-b border-slate-200 bg-slate-50 px-4 pt-2 gap-2 text-xs font-semibold">
-              <button onclick="switchSubTab1DOF('time')" id="subtab-1dof-time" class="px-3 py-2 border-b-2 border-blue-600 text-blue-600 bg-white rounded-t-md">
-                📈 Desplazamiento x(t) y Velocidad
-              </button>
-              <button onclick="switchSubTab1DOF('phase')" id="subtab-1dof-phase" class="px-3 py-2 text-slate-600 hover:text-slate-900">
-                🌀 Diagrama de Fase (x vs v)
-              </button>
-              <button onclick="switchSubTab1DOF('bode')" id="subtab-1dof-bode" class="px-3 py-2 text-slate-600 hover:text-slate-900">
-                🎯 Curva de Resonancia M(r)
-              </button>
+            <div class="flex flex-wrap items-center justify-between border-b border-slate-200 bg-slate-50 px-4 pt-2 gap-2 text-xs font-semibold">
+              <div class="flex gap-2 flex-wrap">
+                <button onclick="switchSubTab1DOF('time')" id="subtab-1dof-time" class="px-3 py-2 border-b-2 border-blue-600 text-blue-600 bg-white rounded-t-md">
+                  📈 Desplazamiento x(t) y Velocidad
+                </button>
+                <button onclick="switchSubTab1DOF('phase')" id="subtab-1dof-phase" class="px-3 py-2 text-slate-600 hover:text-slate-900">
+                  🌀 Diagrama de Fase (x vs v)
+                </button>
+                <button onclick="switchSubTab1DOF('bode')" id="subtab-1dof-bode" class="px-3 py-2 text-slate-600 hover:text-slate-900">
+                  🎯 Curva de Resonancia M(r)
+                </button>
+              </div>
+
+              <!-- CONTROLES DE ZOOM 1 GDL -->
+              <div class="flex items-center gap-1.5 pb-2">
+                <span class="text-slate-400 font-medium text-[11px] hidden sm:inline mr-0.5">Zoom:</span>
+                <button onclick="zoomActive1DOF(0.75)" title="Acercar (Zoom In)" class="px-2.5 py-1 bg-white hover:bg-blue-50 hover:text-blue-600 border border-slate-300 text-slate-700 rounded-md font-semibold text-xs flex items-center gap-1 shadow-2xs transition active:scale-95">
+                  🔍+ <span>Acercar</span>
+                </button>
+                <button onclick="zoomActive1DOF(1.33)" title="Alejar (Zoom Out)" class="px-2.5 py-1 bg-white hover:bg-blue-50 hover:text-blue-600 border border-slate-300 text-slate-700 rounded-md font-semibold text-xs flex items-center gap-1 shadow-2xs transition active:scale-95">
+                  🔍- <span>Alejar</span>
+                </button>
+                <button onclick="resetZoomActive1DOF()" title="Restablecer Escala Original" class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-600 rounded-md font-semibold text-xs flex items-center gap-1 shadow-2xs transition active:scale-95">
+                  ↺ <span>Restablecer</span>
+                </button>
+              </div>
             </div>
 
             <div class="p-4 space-y-3">
               
               <!-- BARRA DE REPRODUCCIÓN / ANIMACIÓN 1 GDL -->
               <div id="anim-bar-1dof" class="bg-blue-50/80 border border-blue-200 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-xs">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                   <button id="btn-1dof-play" onclick="togglePlay1DOF()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 shadow-sm transition active:scale-95">
                     <span id="btn-1dof-icon">▶️</span> <span id="btn-1dof-text">Iniciar Oscilación en Tiempo Real</span>
+                  </button>
+                  <button id="btn-1dof-reset" onclick="resetAnimation1DOF()" title="Reiniciar oscilación desde t = 0" class="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-semibold rounded-lg text-xs flex items-center gap-1.5 transition active:scale-95 shadow-2xs">
+                    🔄 Reiniciar Oscilación
                   </button>
                   <button onclick="showFullPlot1DOF()" class="px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-medium rounded-lg text-xs transition">
                     ⏹️ Ver Gráfico Completo
@@ -455,16 +474,32 @@
 
           <!-- Sub-pestañas 2 GDL -->
           <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="flex border-b border-slate-200 bg-slate-50 px-4 pt-2 gap-2 text-xs font-semibold">
-              <button onclick="switchSubTab2DOF('time')" id="subtab-2dof-time" class="px-3 py-2 border-b-2 border-purple-600 text-purple-600 bg-white rounded-t-md">
-                📈 Respuestas x1(t) y x2(t)
-              </button>
-              <button onclick="switchSubTab2DOF('modes')" id="subtab-2dof-modes" class="px-3 py-2 text-slate-600 hover:text-slate-900">
-                📊 Formas Modales
-              </button>
-              <button onclick="switchSubTab2DOF('orbit')" id="subtab-2dof-orbit" class="px-3 py-2 text-slate-600 hover:text-slate-900">
-                🌀 Plano de Acoplamiento (x1 vs x2)
-              </button>
+            <div class="flex flex-wrap items-center justify-between border-b border-slate-200 bg-slate-50 px-4 pt-2 gap-2 text-xs font-semibold">
+              <div class="flex gap-2 flex-wrap">
+                <button onclick="switchSubTab2DOF('time')" id="subtab-2dof-time" class="px-3 py-2 border-b-2 border-purple-600 text-purple-600 bg-white rounded-t-md">
+                  📈 Respuestas x1(t) y x2(t)
+                </button>
+                <button onclick="switchSubTab2DOF('modes')" id="subtab-2dof-modes" class="px-3 py-2 text-slate-600 hover:text-slate-900">
+                  📊 Formas Modales
+                </button>
+                <button onclick="switchSubTab2DOF('orbit')" id="subtab-2dof-orbit" class="px-3 py-2 text-slate-600 hover:text-slate-900">
+                  🌀 Plano de Acoplamiento (x1 vs x2)
+                </button>
+              </div>
+
+              <!-- CONTROLES DE ZOOM 2 GDL -->
+              <div class="flex items-center gap-1.5 pb-2">
+                <span class="text-slate-400 font-medium text-[11px] hidden sm:inline mr-0.5">Zoom:</span>
+                <button onclick="zoomActive2DOF(0.75)" title="Acercar (Zoom In)" class="px-2.5 py-1 bg-white hover:bg-purple-50 hover:text-purple-600 border border-slate-300 text-slate-700 rounded-md font-semibold text-xs flex items-center gap-1 shadow-2xs transition active:scale-95">
+                  🔍+ <span>Acercar</span>
+                </button>
+                <button onclick="zoomActive2DOF(1.33)" title="Alejar (Zoom Out)" class="px-2.5 py-1 bg-white hover:bg-purple-50 hover:text-purple-600 border border-slate-300 text-slate-700 rounded-md font-semibold text-xs flex items-center gap-1 shadow-2xs transition active:scale-95">
+                  🔍- <span>Alejar</span>
+                </button>
+                <button onclick="resetZoomActive2DOF()" title="Restablecer Escala Original" class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-600 rounded-md font-semibold text-xs flex items-center gap-1 shadow-2xs transition active:scale-95">
+                  ↺ <span>Restablecer</span>
+                </button>
+              </div>
             </div>
 
             <div class="p-4 space-y-3">
@@ -474,6 +509,9 @@
                 <div class="flex items-center gap-2 flex-wrap">
                   <button id="btn-2dof-play" onclick="togglePlay2DOF()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg text-xs flex items-center gap-1.5 shadow-sm transition active:scale-95">
                     <span id="btn-2dof-icon">▶️</span> <span id="btn-2dof-text">Iniciar Oscilación 2 GDL</span>
+                  </button>
+                  <button id="btn-2dof-reset" onclick="resetAnimation2DOF()" title="Reiniciar oscilación desde t = 0" class="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-semibold rounded-lg text-xs flex items-center gap-1.5 transition active:scale-95 shadow-2xs">
+                    🔄 Reiniciar Oscilación
                   </button>
                   <button onclick="showFullPlot2DOF()" class="px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-medium rounded-lg text-xs transition">
                     ⏹️ Ver Gráfico Completo
@@ -611,16 +649,32 @@
 
           <!-- Pestañas de Gráficos Fourier -->
           <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="flex border-b border-slate-200 bg-slate-50 px-4 pt-2 gap-2 text-xs font-semibold">
-              <button onclick="switchSubTabFourier('spec')" id="subtab-fourier-spec" class="px-3 py-2 border-b-2 border-emerald-600 text-emerald-600 bg-white rounded-t-md">
-                📊 Espectro FFT de Frecuencias
-              </button>
-              <button onclick="switchSubTabFourier('recon')" id="subtab-fourier-recon" class="px-3 py-2 text-slate-600 hover:text-slate-900">
-                🔄 Reconstrucción vs Original y Error
-              </button>
-              <button onclick="switchSubTabFourier('table')" id="subtab-fourier-table" class="px-3 py-2 text-slate-600 hover:text-slate-900">
-                📋 Tabla de Armónicos y Ecuación
-              </button>
+            <div class="flex flex-wrap items-center justify-between border-b border-slate-200 bg-slate-50 px-4 pt-2 gap-2 text-xs font-semibold">
+              <div class="flex gap-2 flex-wrap">
+                <button onclick="switchSubTabFourier('spec')" id="subtab-fourier-spec" class="px-3 py-2 border-b-2 border-emerald-600 text-emerald-600 bg-white rounded-t-md">
+                  📊 Espectro FFT de Frecuencias
+                </button>
+                <button onclick="switchSubTabFourier('recon')" id="subtab-fourier-recon" class="px-3 py-2 text-slate-600 hover:text-slate-900">
+                  🔄 Reconstrucción vs Original y Error
+                </button>
+                <button onclick="switchSubTabFourier('table')" id="subtab-fourier-table" class="px-3 py-2 text-slate-600 hover:text-slate-900">
+                  📋 Tabla de Armónicos y Ecuación
+                </button>
+              </div>
+
+              <!-- CONTROLES DE ZOOM FOURIER -->
+              <div id="zoom-controls-fourier" class="flex items-center gap-1.5 pb-2">
+                <span class="text-slate-400 font-medium text-[11px] hidden sm:inline mr-0.5">Zoom:</span>
+                <button onclick="zoomActiveFourier(0.75)" title="Acercar (Zoom In)" class="px-2.5 py-1 bg-white hover:bg-emerald-50 hover:text-emerald-600 border border-slate-300 text-slate-700 rounded-md font-semibold text-xs flex items-center gap-1 shadow-2xs transition active:scale-95">
+                  🔍+ <span>Acercar</span>
+                </button>
+                <button onclick="zoomActiveFourier(1.33)" title="Alejar (Zoom Out)" class="px-2.5 py-1 bg-white hover:bg-emerald-50 hover:text-emerald-600 border border-slate-300 text-slate-700 rounded-md font-semibold text-xs flex items-center gap-1 shadow-2xs transition active:scale-95">
+                  🔍- <span>Alejar</span>
+                </button>
+                <button onclick="resetZoomActiveFourier()" title="Restablecer Escala Original" class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-600 rounded-md font-semibold text-xs flex items-center gap-1 shadow-2xs transition active:scale-95">
+                  ↺ <span>Restablecer</span>
+                </button>
+              </div>
             </div>
 
             <div class="p-4">
@@ -783,7 +837,97 @@
       }, 50);
     }
 
+    // ==============================================================
+    // CONTROL DE PESTAÑAS, ZOOM Y REINICIO DE OSCILACIONES
+    // ==============================================================
+    let currentSubTab1DOF = 'time';
+    let currentSubTab2DOF = 'time';
+    let currentSubTabFourier = 'spec';
+    const plotZoomState = {};
+
+    const defaultPlotlyConfig = {
+      responsive: true,
+      displayModeBar: true,
+      displaylogo: false,
+      modeBarButtonsToRemove: ['lasso2d', 'select2d']
+    };
+
+    function getPlotAxisRanges(plotId) {
+      const gd = document.getElementById(plotId);
+      if (!gd) return null;
+      const layout = gd._fullLayout || gd.layout;
+      if (!layout || !layout.xaxis || !layout.yaxis) return null;
+      return {
+        x: [layout.xaxis.range[0], layout.xaxis.range[1]],
+        y: [layout.yaxis.range[0], layout.yaxis.range[1]]
+      };
+    }
+
+    function attachZoomListener(plotId) {
+      const gd = document.getElementById(plotId);
+      if (!gd || gd._hasZoomListener) return;
+      gd._hasZoomListener = true;
+      gd.on('plotly_relayout', function(eventData) {
+        if (!eventData) return;
+        if (eventData['xaxis.range[0]'] !== undefined && eventData['xaxis.range[1]'] !== undefined) {
+          const y0 = eventData['yaxis.range[0]'] !== undefined ? eventData['yaxis.range[0]'] : (gd._fullLayout ? gd._fullLayout.yaxis.range[0] : undefined);
+          const y1 = eventData['yaxis.range[1]'] !== undefined ? eventData['yaxis.range[1]'] : (gd._fullLayout ? gd._fullLayout.yaxis.range[1] : undefined);
+          plotZoomState[plotId] = {
+            x: [eventData['xaxis.range[0]'], eventData['xaxis.range[1]']],
+            y: (y0 !== undefined && y1 !== undefined) ? [y0, y1] : undefined
+          };
+        } else if (eventData['xaxis.autorange'] === true) {
+          delete plotZoomState[plotId];
+        }
+      });
+    }
+
+    function zoomPlot(plotId, factor) {
+      const gd = document.getElementById(plotId);
+      if (!gd) return;
+      const ranges = getPlotAxisRanges(plotId);
+      if (!ranges || isNaN(ranges.x[0]) || isNaN(ranges.x[1])) return;
+
+      const x0 = ranges.x[0], x1 = ranges.x[1];
+      const y0 = ranges.y[0], y1 = ranges.y[1];
+
+      const xMid = (x0 + x1) / 2;
+      const xSpan = (x1 - x0) * factor;
+
+      const yMid = (y0 + y1) / 2;
+      const ySpan = (y1 - y0) * factor;
+
+      const newRangeX = [xMid - xSpan / 2, xMid + xSpan / 2];
+      const newRangeY = [yMid - ySpan / 2, yMid + ySpan / 2];
+
+      plotZoomState[plotId] = { x: newRangeX, y: newRangeY };
+
+      Plotly.relayout(plotId, {
+        'xaxis.range': newRangeX,
+        'yaxis.range': newRangeY,
+        'xaxis.autorange': false,
+        'yaxis.autorange': false
+      });
+    }
+
+    function resetPlotZoom(plotId) {
+      delete plotZoomState[plotId];
+      if (plotId === 'plot-1dof-time' && currentSignal1DOF.t) {
+        const sig = currentSignal1DOF;
+        plot1DOFTime(sig.t, sig.x, sig.v, sig.F, sig.k, sig.F0, sig.zeta, sig.wn, sig.wd, sig.x0, sig.v0, animState1DOF.currentFrame);
+      } else if (plotId === 'plot-2dof-time' && currentSignal2DOF.t) {
+        const sig = currentSignal2DOF;
+        plot2DOFTime(sig.t, sig.x1, sig.x2, animState2DOF.currentFrame);
+      } else {
+        Plotly.relayout(plotId, {
+          'xaxis.autorange': true,
+          'yaxis.autorange': true
+        });
+      }
+    }
+
     function switchSubTab1DOF(subId) {
+      currentSubTab1DOF = subId;
       ['time', 'phase', 'bode'].forEach(id => {
         document.getElementById(`plot-1dof-${id}`).classList.add('hidden');
         document.getElementById(`subtab-1dof-${id}`).classList.remove('border-b-2', 'border-blue-600', 'text-blue-600', 'bg-white');
@@ -793,7 +937,16 @@
       Plotly.Plots.resize(`plot-1dof-${subId}`);
     }
 
+    function zoomActive1DOF(factor) {
+      zoomPlot(`plot-1dof-${currentSubTab1DOF}`, factor);
+    }
+
+    function resetZoomActive1DOF() {
+      resetPlotZoom(`plot-1dof-${currentSubTab1DOF}`);
+    }
+
     function switchSubTab2DOF(subId) {
+      currentSubTab2DOF = subId;
       ['time', 'modes', 'orbit'].forEach(id => {
         document.getElementById(`plot-2dof-${id}`).classList.add('hidden');
         document.getElementById(`subtab-2dof-${id}`).classList.remove('border-b-2', 'border-purple-600', 'text-purple-600', 'bg-white');
@@ -803,7 +956,16 @@
       Plotly.Plots.resize(`plot-2dof-${subId}`);
     }
 
+    function zoomActive2DOF(factor) {
+      zoomPlot(`plot-2dof-${currentSubTab2DOF}`, factor);
+    }
+
+    function resetZoomActive2DOF() {
+      resetPlotZoom(`plot-2dof-${currentSubTab2DOF}`);
+    }
+
     function switchSubTabFourier(subId) {
+      currentSubTabFourier = subId;
       ['spec', 'recon', 'table'].forEach(id => {
         const el = id === 'table' ? document.getElementById('box-fourier-table') : document.getElementById(`plot-fourier-${id}`);
         el.classList.add('hidden');
@@ -812,7 +974,51 @@
       const activeEl = subId === 'table' ? document.getElementById('box-fourier-table') : document.getElementById(`plot-fourier-${subId}`);
       activeEl.classList.remove('hidden');
       document.getElementById(`subtab-fourier-${subId}`).classList.add('border-b-2', 'border-emerald-600', 'text-emerald-600', 'bg-white');
+
+      const zoomControls = document.getElementById('zoom-controls-fourier');
+      if (zoomControls) {
+        zoomControls.classList.toggle('hidden', subId === 'table');
+      }
+
       if (subId !== 'table') Plotly.Plots.resize(`plot-fourier-${subId}`);
+    }
+
+    function zoomActiveFourier(factor) {
+      if (currentSubTabFourier !== 'table') {
+        zoomPlot(`plot-fourier-${currentSubTabFourier}`, factor);
+      }
+    }
+
+    function resetZoomActiveFourier() {
+      if (currentSubTabFourier !== 'table') {
+        resetPlotZoom(`plot-fourier-${currentSubTabFourier}`);
+      }
+    }
+
+    function resetAnimation1DOF() {
+      stopAnimation1DOF();
+      const sig = currentSignal1DOF;
+      if (!sig.t || sig.t.length === 0) return;
+      animState1DOF.currentFrame = 0;
+      const totalT = sig.t[sig.t.length - 1];
+      document.getElementById('anim-1dof-clock').textContent = `⏱️ t = 0.00 s / ${totalT.toFixed(1)} s`;
+      document.getElementById('btn-1dof-icon').textContent = '▶️';
+      document.getElementById('btn-1dof-text').textContent = 'Iniciar Oscilación en Tiempo Real';
+      plot1DOFTime(sig.t, sig.x, sig.v, sig.F, sig.k, sig.F0, sig.zeta, sig.wn, sig.wd, sig.x0, sig.v0, 0);
+      drawCanvas1DOF(sig.x[0], Math.max(0.1, Math.max(...sig.x.map(Math.abs))));
+    }
+
+    function resetAnimation2DOF() {
+      stopAnimation2DOF();
+      const sig = currentSignal2DOF;
+      if (!sig.t || sig.t.length === 0) return;
+      animState2DOF.currentFrame = 0;
+      const totalT = sig.t[sig.t.length - 1];
+      document.getElementById('anim-2dof-clock').textContent = `⏱️ t = 0.00 s / ${totalT.toFixed(1)} s`;
+      document.getElementById('btn-2dof-icon').textContent = '▶️';
+      document.getElementById('btn-2dof-text').textContent = 'Iniciar Oscilación 2 GDL';
+      plot2DOFTime(sig.t, sig.x1, sig.x2, 0);
+      drawCanvas2DOF(sig.x1[0], sig.x2[0], Math.max(0.1, Math.max(...sig.x1.map(Math.abs), ...sig.x2.map(Math.abs))), sig.isFixedFixed);
     }
 
     function toggleForce1DOF() {
@@ -956,7 +1162,10 @@
         document.getElementById('metric-1dof-phase').textContent = `Libre (Amplitud máx observada)`;
       }
 
-      // Reiniciar reloj
+      // Reiniciar zoom y reloj
+      delete plotZoomState['plot-1dof-time'];
+      delete plotZoomState['plot-1dof-phase'];
+      delete plotZoomState['plot-1dof-bode'];
       document.getElementById('anim-1dof-clock').textContent = `⏱️ t = ${tMax.toFixed(1)} s / ${tMax.toFixed(1)} s`;
 
       // Graficar
@@ -1010,15 +1219,20 @@
       }
 
       const maxAbs = Math.max(0.1, Math.max(...x.map(Math.abs)) * 1.25);
+      const zoom = plotZoomState['plot-1dof-time'];
+      const xRange = zoom ? zoom.x : [0, t[t.length - 1]];
+      const yRange = zoom ? zoom.y : [-maxAbs, maxAbs];
+
       const layout = {
         title: { text: 'Respuesta Temporal x(t) [m]', font: { size: 14 } },
-        xaxis: { title: 'Tiempo t [s]', range: [0, t[t.length - 1]], zeroline: true },
-        yaxis: { title: 'Posición [m]', range: [-maxAbs, maxAbs], zeroline: true },
+        xaxis: { title: 'Tiempo t [s]', range: xRange, zeroline: true },
+        yaxis: { title: 'Posición [m]', range: yRange, zeroline: true },
         margin: { l: 45, r: 20, t: 40, b: 40 },
         legend: { orientation: 'h', y: 1.15, x: 1, xanchor: 'right' }
       };
 
-      Plotly.react('plot-1dof-time', traces, layout, { responsive: true, displayModeBar: false });
+      Plotly.react('plot-1dof-time', traces, layout, defaultPlotlyConfig);
+      attachZoomListener('plot-1dof-time');
     }
 
     // ANIMACIÓN EN TIEMPO REAL 1 GDL
@@ -1188,7 +1402,8 @@
         margin: { l: 45, r: 20, t: 40, b: 40 }
       };
 
-      Plotly.react('plot-1dof-phase', [trace, traceInit], layout, { responsive: true, displayModeBar: false });
+      Plotly.react('plot-1dof-phase', [trace, traceInit], layout, defaultPlotlyConfig);
+      attachZoomListener('plot-1dof-phase');
     }
 
     function plot1DOFBode(zeta, currR, currM, currPhi) {
@@ -1222,7 +1437,8 @@
         margin: { l: 45, r: 20, t: 40, b: 40 }
       };
 
-      Plotly.react('plot-1dof-bode', [traceM, tracePoint], layout, { responsive: true, displayModeBar: false });
+      Plotly.react('plot-1dof-bode', [traceM, tracePoint], layout, defaultPlotlyConfig);
+      attachZoomListener('plot-1dof-bode');
     }
 
     // ==============================================================
@@ -1369,6 +1585,9 @@
       const max2 = Math.max(...x2.map(Math.abs));
       document.getElementById('metric-2dof-amps').textContent = `|x1|=${max1.toFixed(3)} |x2|=${max2.toFixed(3)} m`;
 
+      // Reiniciar zoom y reloj 2 GDL
+      delete plotZoomState['plot-2dof-time'];
+      delete plotZoomState['plot-2dof-orbit'];
       document.getElementById('anim-2dof-clock').textContent = `⏱️ t = ${tMax.toFixed(1)} s / ${tMax.toFixed(1)} s`;
 
       plot2DOFTime(t, x1, x2, N - 1);
@@ -1435,15 +1654,20 @@
       }
       const maxAbs = Math.max(0.1, Math.max(...maxVals) * 1.25);
 
+      const zoom = plotZoomState['plot-2dof-time'];
+      const xRange = zoom ? zoom.x : [0, t[t.length - 1]];
+      const yRange = zoom ? zoom.y : [-maxAbs, maxAbs];
+
       const layout = {
         title: { text: showSum ? 'Oscilación Temporal: x₁(t), x₂(t) y Suma x₁(t) + x₂(t)' : 'Oscilación Temporal de Masas Acopladas: x₁(t) y x₂(t)', font: { size: 14 } },
-        xaxis: { title: 'Tiempo t [s]', range: [0, t[t.length - 1]], zeroline: true },
-        yaxis: { title: 'Desplazamiento [m]', range: [-maxAbs, maxAbs], zeroline: true },
+        xaxis: { title: 'Tiempo t [s]', range: xRange, zeroline: true },
+        yaxis: { title: 'Desplazamiento [m]', range: yRange, zeroline: true },
         margin: { l: 45, r: 20, t: 40, b: 40 },
         legend: { orientation: 'h', y: 1.15, x: 1, xanchor: 'right' }
       };
 
-      Plotly.react('plot-2dof-time', traces, layout, { responsive: true, displayModeBar: false });
+      Plotly.react('plot-2dof-time', traces, layout, defaultPlotlyConfig);
+      attachZoomListener('plot-2dof-time');
     }
 
     // ANIMACIÓN EN TIEMPO REAL 2 GDL
@@ -1629,7 +1853,7 @@
         legend: { orientation: 'h', y: 1.15, x: 1, xanchor: 'right' }
       };
 
-      Plotly.react('plot-2dof-modes', [traceModo1, traceModo2], layout, { responsive: true, displayModeBar: false });
+      Plotly.react('plot-2dof-modes', [traceModo1, traceModo2], layout, defaultPlotlyConfig);
     }
 
     function plot2DOFOrbit(x1, x2) {
@@ -1645,7 +1869,8 @@
         margin: { l: 45, r: 20, t: 40, b: 40 }
       };
 
-      Plotly.react('plot-2dof-orbit', [trace], layout, { responsive: true, displayModeBar: false });
+      Plotly.react('plot-2dof-orbit', [trace], layout, defaultPlotlyConfig);
+      attachZoomListener('plot-2dof-orbit');
     }
 
     // ==============================================================
@@ -1844,7 +2069,8 @@
         legend: { orientation: 'h', y: 1.15, x: 1, xanchor: 'right' }
       };
 
-      Plotly.react('plot-fourier-spec', [traceAll, traceSelected], layout, { responsive: true, displayModeBar: false });
+      Plotly.react('plot-fourier-spec', [traceAll, traceSelected], layout, defaultPlotlyConfig);
+      attachZoomListener('plot-fourier-spec');
     }
 
     function plotFourierRecon(t, xOrig, xRec, residual, numComp, r2) {
@@ -1870,7 +2096,8 @@
         legend: { orientation: 'h', y: 1.15, x: 1, xanchor: 'right' }
       };
 
-      Plotly.react('plot-fourier-recon', [traceOrig, traceFit, traceRes], layout, { responsive: true, displayModeBar: false });
+      Plotly.react('plot-fourier-recon', [traceOrig, traceFit, traceRes], layout, defaultPlotlyConfig);
+      attachZoomListener('plot-fourier-recon');
     }
 
     function buildFourierTable(comps, dcVal, numComp) {

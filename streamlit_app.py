@@ -26,6 +26,14 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Configuración global de controles de interactividad y zoom para Plotly
+PLOTLY_CONFIG = {
+    "displayModeBar": True,
+    "displaylogo": False,
+    "modeBarButtonsToRemove": ["lasso2d", "select2d"],
+    "scrollZoom": True
+}
+
 # Estilos CSS personalizados para mejorar el aspecto visual educativo
 st.markdown("""
 <style>
@@ -236,15 +244,15 @@ if app_mode == "🔵 1 Grado de Libertad (1 GDL)":
 
         with tab_time:
             fig_time = plot_1dof_time_response(sim_res, sys_1dof, show_envelope=True)
-            st.plotly_chart(fig_time, use_container_width=True)
+            st.plotly_chart(fig_time, use_container_width=True, config=PLOTLY_CONFIG)
 
         with tab_phase:
             fig_phase = plot_phase_portrait(sim_res["x"], sim_res["v"], title="Plano de Fase: Velocidad vs Desplazamiento")
-            st.plotly_chart(fig_phase, use_container_width=True)
+            st.plotly_chart(fig_phase, use_container_width=True, config=PLOTLY_CONFIG)
 
         with tab_bode:
             fig_bode = plot_resonance_curve(sys_1dof)
-            st.plotly_chart(fig_bode, use_container_width=True)
+            st.plotly_chart(fig_bode, use_container_width=True, config=PLOTLY_CONFIG)
 
         with tab_table:
             st.markdown("#### Resumen Analítico de Variables del Sistema")
@@ -479,11 +487,11 @@ elif app_mode == "🟣 2 Grados de Libertad (2 GDL)":
         with tab_2dof_time:
             show_sum_streamlit = st.checkbox("Mostrar curva de la suma x₁(t) + x₂(t)", value=True)
             fig_2t = plot_2dof_time_response(sim_2dof, F01, F02, show_sum=show_sum_streamlit)
-            st.plotly_chart(fig_2t, use_container_width=True)
+            st.plotly_chart(fig_2t, use_container_width=True, config=PLOTLY_CONFIG)
 
         with tab_2dof_modes:
             fig_modes = plot_mode_shapes(modal)
-            st.plotly_chart(fig_modes, use_container_width=True)
+            st.plotly_chart(fig_modes, use_container_width=True, config=PLOTLY_CONFIG)
             st.markdown("""
             > **Interpretación de Modos de Vibración:**
             > - **Modo 1:** Ambas masas oscilan en la misma dirección al unísono con frecuencia $\\omega_{n1}$.
@@ -494,14 +502,14 @@ elif app_mode == "🟣 2 Grados de Libertad (2 GDL)":
             col_orb1, col_orb2 = st.columns(2)
             with col_orb1:
                 fig_orb = plot_2dof_orbit(sim_2dof["x1"], sim_2dof["x2"])
-                st.plotly_chart(fig_orb, use_container_width=True)
+                st.plotly_chart(fig_orb, use_container_width=True, config=PLOTLY_CONFIG)
             with col_orb2:
                 fig_pf1 = plot_phase_portrait(sim_2dof["x1"], sim_2dof["v1"], title="Plano de Fase Masa 1 (x₁ vs v₁)")
-                st.plotly_chart(fig_pf1, use_container_width=True)
+                st.plotly_chart(fig_pf1, use_container_width=True, config=PLOTLY_CONFIG)
 
         with tab_2dof_bode:
             fig_sw = plot_2dof_resonance_curves(sys_2dof)
-            st.plotly_chart(fig_sw, use_container_width=True)
+            st.plotly_chart(fig_sw, use_container_width=True, config=PLOTLY_CONFIG)
 
         with tab_2dof_mat:
             st.markdown("#### Formulación Matricial del Sistema")
@@ -650,7 +658,7 @@ elif app_mode == "📊 Análisis de Fourier y Ajuste Espectral":
 
         with tab_fft_spec:
             fig_spec = plot_fourier_spectrum(fft_res, components_info, freq_unit=unit_key)
-            st.plotly_chart(fig_spec, use_container_width=True)
+            st.plotly_chart(fig_spec, use_container_width=True, config=PLOTLY_CONFIG)
             st.caption("Los puntos rojos señalan los N picos de mayor amplitud seleccionados para reconstruir la señal.")
 
         with tab_fft_recon:
@@ -658,7 +666,7 @@ elif app_mode == "📊 Análisis de Fourier y Ajuste Espectral":
                 t_signal, x_signal, recon_res["x_rec"], recon_res["residual"],
                 num_comp=num_components, r2=r2, rmse=rmse
             )
-            st.plotly_chart(fig_rec, use_container_width=True)
+            st.plotly_chart(fig_rec, use_container_width=True, config=PLOTLY_CONFIG)
 
         with tab_fft_table:
             st.markdown(f"#### Ecuación Analítica del Ajuste con {num_components} Componentes:")
